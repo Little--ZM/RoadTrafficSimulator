@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <head>
     <meta charset="utf-8">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
+
     <link rel="stylesheet" href="css/style.css" />
     <link rel="icon" href="images/favicon.png" />
     <script src="dist/main.js"></script>
@@ -8,6 +12,48 @@
     <title>Tongji Traffic Simulator</title>
 </head>
 <body>
+    <div id="wrapper">
+        <nav class="navbar-default navbar-static-side" role="navigation">
+            <div class="sidebar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li class="nav-header">
+                        <div class="dropdown profile-element"> <span>
+                            <img alt="Tongji University" src="images/tongji.jpg" width="100%" />
+                             </span>
+                            <a data-toggle="dropdown" class="dropdown-toggle" href="index.html#">
+                            <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">Tongji Traffic Simulator</strong></span>
+                            <span class="text-muted text-xs block">min.zhu <b class="caret"></b></span> </span> </a>
+                            <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                                <li><a href="profile.html">Profile</a></li>
+                                <li><a href="contacts.html">Contacts</a></li>
+                                <li><a href="mailbox.html">Mailbox</a></li>
+                                <li class="divider"></li>
+                                <li><a href="login.html">Logout</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="active">
+                        <a href="#"><i class="fa fa-diamond"></i><span class="nav-label">Home</span></a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fa fa-flask"></i><span class="nav-label">Simulation</span></a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fa fa-bar-chart-o"></i> <span class="nav-label">Result</span><span class="label label-primary pull-right">NEW</span></a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fa fa-question-circle"></i><span class="nav-label">Help</span></a>
+                    </li>
+                </ul>
 
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="gray-bg dashbard-1">
+        </div>
+    </div>
+
+    <script src="js/jquery-2.1.1.js"></script>
+    <script src="js/bootstrap.min.js"></script>
 </body>
 </html>

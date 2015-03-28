@@ -71,4 +71,4 @@ gulp.task 'coverage', ->
 gulp.task 'default', ['lint', 'build', 'test', 'uglify']
 
 gulp.task 'watch', ->
-  gulp.watch './coffee/**/*.coffee', ['default']
+  gulp.watch './coffee/**/*.coffee', ['build']

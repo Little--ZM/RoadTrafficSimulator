@@ -10,7 +10,7 @@ settings = require './settings'
 
 $ ->
   canvas = $('<canvas />', {id: 'canvas'})
-  $(document.body).append(canvas)
+  $('#page-wrapper').append(canvas)
 
   window.world = new World()
   world.generateMap()
