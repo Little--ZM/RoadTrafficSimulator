@@ -83,28 +83,31 @@
                             </span>
                         </div>
                         <div class="m-b">
-                            <button id="generate-single" class="btn btn-primary">Generate Single</button>
+                            <label>Generate</label>
+                            <button id="generate-single" class="btn btn-sm btn-primary">Single</button>
+                            <button id="generate-complex" class="btn btn-sm btn-primary">Complex</button>
                         </div>
                         <div class="m-b">
-                            <button id="generate-complex" class="btn btn-primary">Generate Complex</button>
+                            <label>Cars Number</label>
+                            <input type="text" id="cars_number" data-min="0" data-max="200" data-from="10">
                         </div>
-                        <div>
-                            <label for="cars_number">Cars Number</label>
-                            <input type="text" id="cars_number" name="cars_number" data-min="0" data-max="200" data-from="10">
+                        <div class="m-b">
+                            <label>Scale</label>
+                            <input type="text" id="scale" data-min="0.1" data-max="2" data-from="1" data-step="0.01">
                         </div>
-                        <div>
-                            <label for="scale">Scale</label>
-                            <input type="text" id="scale" name="scale" data-min="0.1" data-max="2" data-from="1" data-step="0.01">
+                        <div class="m-b">
+                            <label>Time Factor</label>
+                            <br>
+                            <input type="text" id="timeFactor" value="5"
+                                data-min="0.1" data-max="10" data-step="0.1" data-width="85" data-height="85">
                         </div>
-                        <div>
-                            <label for="timeFactor">Time Factor</label>
-                            <input type="text" id="timeFactor" name="timeFactor" value="5"
-                                data-min="0.1" data-max="10" data-step="0.1">
-                        </div>
-                        <div>
-                            <label for="scale">Lights Flip Interval</label>
-                            <input type="text" id="lightsFlipInterval" name="lightsFlipInterval" value="10"
-                                data-min="0" data-max="50" data-step="0.01">
+                        <div class="m-b">
+                            <label>Lights Flip Interval</label>
+                            <br>
+                            <input type="text" id="lightsFlipIntervalGreen" value="10" data-fgcolor="#1AB394"
+                                data-min="0" data-max="50" data-step="0.01" data-width="85" data-height="85">
+                            <input type="text" id="lightsFlipIntervalRed" value="10" data-fgcolor="#ED5565"
+                                data-min="0" data-max="50" data-step="0.01" data-width="85" data-height="85">
                         </div>
                     </div>
                 </div>
@@ -201,7 +204,10 @@ $(function() {
     $("#timeFactor").knob({
         'release' : function (v) { visualizer.timeFactor = v; }
     });
-    $("#lightsFlipInterval").knob({
+    $("#lightsFlipIntervalGreen").knob({
+        'release' : function (v) { settings.lightsFlipInterval = v; }
+    });
+    $("#lightsFlipIntervalRed").knob({
         'release' : function (v) { settings.lightsFlipInterval = v; }
     });
 
