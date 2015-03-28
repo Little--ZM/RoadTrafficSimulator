@@ -7,6 +7,7 @@ Lane = require './lane'
 settings = require '../settings'
 
 class Road
+#   道路的使用类
   constructor: (@source, @target) ->
     @id = _.uniqueId 'road'
     @lanes = []
@@ -48,13 +49,20 @@ class Road
     @targetSideId = @target.rect.getSectorId @source.rect.center()
     @targetSide = @target.rect.getSide(@targetSideId).subsegment 0, 0.5
     @lanesNumber = min(@sourceSide.length, @targetSide.length) | 0
+#    设置自己的道路的 车道数
     @lanesNumber = max 2, @lanesNumber / settings.gridSize | 0
     sourceSplits = @sourceSide.split @lanesNumber, true
     targetSplits = @targetSide.split @lanesNumber
     if not @lanes? or @lanes.length < @lanesNumber
       @lanes ?= []
       for i in [0..@lanesNumber - 1]
-        @lanes[i] ?= new Lane sourceSplits[i], targetSplits[i], this
+        canTurnLeft = true
+        canTurnRight = false
+#        添加车道index
+        if i is 0
+          canTurnLeft = false
+          canTurnRight = true
+        @lanes[i] ?= new Lane @id+"_lane_"+i, sourceSplits[i], targetSplits[i], this, i,canTurnLeft , canTurnRight, true
     for i in [0..@lanesNumber - 1]
       @lanes[i].sourceSegment = sourceSplits[i]
       @lanes[i].targetSegment = targetSplits[i]

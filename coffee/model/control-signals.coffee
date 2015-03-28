@@ -17,6 +17,18 @@ class ControlSignals
     ['', 'FR', '', 'FR']
   ]
 
+#  states: [
+#    ['LR', 'R', 'LR', 'R'],
+#    ['FRL', 'R', 'FRL', 'R'],
+#    ['R', 'LR', 'R', 'LR'],
+#    ['R', 'FRL', 'R', 'FRL']
+#  ]
+
+#  states: [
+#    ['FRL', '', 'FRL', ''],
+#    ['', 'FRL', '', 'FRL']
+#  ]
+
   @STATE = [RED: 0, GREEN: 1]
 
   @property 'flipInterval',
@@ -32,8 +44,6 @@ class ControlSignals
   @property 'state',
     get: ->
       stringState = @states[@stateNum % @states.length]
-      if @intersection.roads.length <= 2
-        stringState = ['LFR', 'LFR', 'LFR', 'LFR']
       (@_decode x for x in stringState)
 
   flip: ->

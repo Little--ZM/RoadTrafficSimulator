@@ -6,13 +6,13 @@ _ = require 'underscore'
 Trajectory = require './trajectory'
 
 class Car
-  constructor: (lane, position) ->
+  constructor: (lane, position,speed,length) ->
     @id = _.uniqueId 'car'
     @color = (300 + 240 * random() | 0) % 360
-    @_speed = 0
+    @_speed = speed
     @width = 1.7
-    @length = 3 + 2 * random()
-    @maxSpeed = 30
+    @length = length
+    @maxSpeed = _.random(30,50)
     @s0 = 2
     @timeHeadway = 1.5
     @maxAcceleration = 1
@@ -21,9 +21,20 @@ class Car
     @alive = true
     @preferedLane = null
 
+#   可以换到的距离
+    @canChangeLanePosition = null
+#    行车起始时间
+    @beginTime = null
+#    行车结束时间
+    @stopTime = null
+#    车辆的行程
+    @distance = 0.0
+
+#    坐标
   @property 'coords',
     get: -> @trajectory.coords
 
+#     速度
   @property 'speed',
     get: -> @_speed
     set: (speed) ->
@@ -31,12 +42,31 @@ class Car
       speed = @maxSpeed if speed > @maxSpeed
       @_speed = speed
 
+#     方向
   @property 'direction',
     get: -> @trajectory.direction
+
+  getChangeLanePosition: ->
+    if @canChangeLanePosition is null
+      lowLaneLength = @trajectory.current.lane.length * 0.2
+      highLaneLength = @trajectory.current.lane.length * 0.5
+      return @canChangeLanePosition = _.random(lowLaneLength, highLaneLength)
+    return @canChangeLanePosition
+
+#  获取时间延误
+  getTimeDelay: ->
+    if not @alive
+      minTime = @distance/@maxSpeed
+      realTime = @stopTime - @beginTime
+      return realTime -minTime
+    else
+      console.log "not stop yet"
+
 
   release: ->
     @trajectory.release()
 
+#    获得加速度
   getAcceleration: ->
     nextCarDistance = @trajectory.nextCarDistance
     distanceToNextCar = max nextCarDistance.distance, 0
@@ -55,36 +85,68 @@ class Car
     coeff = 1 - freeRoadCoeff - busyRoadCoeff - intersectionCoeff
     return @maxAcceleration * coeff
 
+#    移动
   move: (delta) ->
     acceleration = @getAcceleration()
+#    速度加上 加速度*倍速
     @speed += acceleration * delta
 
     if not @trajectory.isChangingLanes and @nextLane
       currentLane = @trajectory.current.lane
       turnNumber = currentLane.getTurnDirection @nextLane
+#      根据转向来将选择的道路来进行
       preferedLane = switch turnNumber
-        when 0 then currentLane.leftmostAdjacent
-        when 2 then currentLane.rightmostAdjacent
+        when 0 then @pickLeftLane currentLane
+        when 2 then @pickRightLane currentLane
         else currentLane
-      if preferedLane isnt currentLane
+      if preferedLane isnt currentLane and @trajectory.absolutePosition > @getChangeLanePosition()
         @trajectory.changeLane preferedLane
 
     step = @speed * delta + 0.5 * acceleration * delta ** 2
-    # TODO: hacks, should have changed speed
-    console.log 'bad IDM' if @trajectory.nextCarDistance.distance < step
+
+#     如果发现下一辆车的距离与小于将要前进的步伐
+    if @trajectory.nextCarDistance.distance < step
+      console.log 'bad IDM'
+      acceleration = @getAcceleration()
+      step = @speed * delta + 0.5 * acceleration * delta ** 2
+
 
     if @trajectory.timeToMakeTurn(step)
       return @alive = false if not @nextLane?
+
+    @distance += step
     @trajectory.moveForward step
 
+  pickLeftLane: (currentLane) ->
+    if not currentLane.isLeftmost
+      return currentLane.leftAdjacent
+    else
+      return currentLane
+
+  pickRightLane: (currentLane) ->
+    if not currentLane.isRightmost
+      return currentLane.rightAdjacent
+    else
+      return currentLane
+
+  pickStraightLane: (currentLane) ->
+    if currentLane.isLeftmost
+      return currentLane.rightAdjacent
+    else
+      return currentLane
+
+
+#    选择吓一跳道路
   pickNextRoad: ->
     intersection = @trajectory.nextIntersection
     currentLane = @trajectory.current.lane
+#    选取可能去的下一个交叉口，这个交叉口是当前交叉口连接的交叉口中挑选。当然，去除了当前的交叉口
     possibleRoads = intersection.roads.filter (x) ->
       x.target isnt currentLane.road.source
     return null if possibleRoads.length is 0
     nextRoad = _.sample possibleRoads
 
+#  这里的下一条车道指的是 下一条道路中的想要选择的车道
   pickNextLane: ->
     throw Error 'next lane is already chosen' if @nextLane
     @nextLane = null
@@ -92,13 +154,21 @@ class Car
     return null if not nextRoad
     # throw Error 'can not pick next road' if not nextRoad
     turnNumber = @trajectory.current.lane.road.getTurnDirection nextRoad
-    laneNumber = switch turnNumber
+    # 0 - left, 1 - forward, 2 - right
+    laneNo = switch turnNumber
       when 0 then nextRoad.lanesNumber - 1
-      when 1 then _.random 0, nextRoad.lanesNumber - 1
+      when 1 then @trajectory.current.lane.laneIndex
       when 2 then 0
-    @nextLane = nextRoad.lanes[laneNumber]
+    @nextLane = nextRoad.lanes[laneNo]
     throw Error 'can not pick next lane' if not @nextLane
     return @nextLane
+
+#  getLaneNumber: (nextRoad) ->
+#    if @lanesNumber < nextRoad.lanesNumber
+#       return @lanesNumber
+#    else
+#      return _.random 0, nextRoad.lanesNumber - 1
+
 
   popNextLane: ->
     nextLane = @nextLane

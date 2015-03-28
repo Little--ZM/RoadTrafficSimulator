@@ -23,10 +23,10 @@ $(function() {
   });
   $(document.body).append(canvas);
   window.world = new World();
-  world.load();
+  world.generateMap();
   if (world.intersections.length === 0) {
     world.generateMap();
-    world.carsNumber = 100;
+    world.carsNumber = 0;
   }
   window.visualizer = new Visualizer(world);
   visualizer.start();
@@ -37,6 +37,8 @@ $(function() {
   guiWorld.add(world, 'load');
   guiWorld.add(world, 'clear');
   guiWorld.add(world, 'generateMap');
+  guiWorld.add(world, 'generateCrossRoadMap');
+  guiWorld.add(world, 'generateSingleCrossRoadMap');
   guiVisualizer = gui.addFolder('visualizer');
   guiVisualizer.open();
   guiVisualizer.add(visualizer, 'running').listen();
@@ -399,13 +401,13 @@ _ = require('underscore');
 Trajectory = require('./trajectory');
 
 Car = (function() {
-  function Car(lane, position) {
+  function Car(lane, position, speed, length) {
     this.id = _.uniqueId('car');
     this.color = (300 + 240 * random() | 0) % 360;
-    this._speed = 0;
+    this._speed = speed;
     this.width = 1.7;
-    this.length = 3 + 2 * random();
-    this.maxSpeed = 30;
+    this.length = length;
+    this.maxSpeed = _.random(30, 50);
     this.s0 = 2;
     this.timeHeadway = 1.5;
     this.maxAcceleration = 1;
@@ -413,6 +415,10 @@ Car = (function() {
     this.trajectory = new Trajectory(this, lane, position);
     this.alive = true;
     this.preferedLane = null;
+    this.canChangeLanePosition = null;
+    this.beginTime = null;
+    this.stopTime = null;
+    this.distance = 0.0;
   }
 
   Car.property('coords', {
@@ -441,6 +447,27 @@ Car = (function() {
       return this.trajectory.direction;
     }
   });
+
+  Car.prototype.getChangeLanePosition = function() {
+    var highLaneLength, lowLaneLength;
+    if (this.canChangeLanePosition === null) {
+      lowLaneLength = this.trajectory.current.lane.length * 0.2;
+      highLaneLength = this.trajectory.current.lane.length * 0.5;
+      return this.canChangeLanePosition = _.random(lowLaneLength, highLaneLength);
+    }
+    return this.canChangeLanePosition;
+  };
+
+  Car.prototype.getTimeDelay = function() {
+    var minTime, realTime;
+    if (!this.alive) {
+      minTime = this.distance / this.maxSpeed;
+      realTime = this.stopTime - this.beginTime;
+      return realTime(-minTime);
+    } else {
+      return console.log("not stop yet");
+    }
+  };
 
   Car.prototype.release = function() {
     return this.trajectory.release();
@@ -475,27 +502,54 @@ Car = (function() {
       preferedLane = (function() {
         switch (turnNumber) {
           case 0:
-            return currentLane.leftmostAdjacent;
+            return this.pickLeftLane(currentLane);
           case 2:
-            return currentLane.rightmostAdjacent;
+            return this.pickRightLane(currentLane);
           default:
             return currentLane;
         }
-      })();
-      if (preferedLane !== currentLane) {
+      }).call(this);
+      if (preferedLane !== currentLane && this.trajectory.absolutePosition > this.getChangeLanePosition()) {
         this.trajectory.changeLane(preferedLane);
       }
     }
     step = this.speed * delta + 0.5 * acceleration * Math.pow(delta, 2);
     if (this.trajectory.nextCarDistance.distance < step) {
       console.log('bad IDM');
+      acceleration = this.getAcceleration();
+      step = this.speed * delta + 0.5 * acceleration * Math.pow(delta, 2);
     }
     if (this.trajectory.timeToMakeTurn(step)) {
       if (this.nextLane == null) {
         return this.alive = false;
       }
     }
+    this.distance += step;
     return this.trajectory.moveForward(step);
+  };
+
+  Car.prototype.pickLeftLane = function(currentLane) {
+    if (!currentLane.isLeftmost) {
+      return currentLane.leftAdjacent;
+    } else {
+      return currentLane;
+    }
+  };
+
+  Car.prototype.pickRightLane = function(currentLane) {
+    if (!currentLane.isRightmost) {
+      return currentLane.rightAdjacent;
+    } else {
+      return currentLane;
+    }
+  };
+
+  Car.prototype.pickStraightLane = function(currentLane) {
+    if (currentLane.isLeftmost) {
+      return currentLane.rightAdjacent;
+    } else {
+      return currentLane;
+    }
   };
 
   Car.prototype.pickNextRoad = function() {
@@ -512,7 +566,7 @@ Car = (function() {
   };
 
   Car.prototype.pickNextLane = function() {
-    var laneNumber, nextRoad, turnNumber;
+    var laneNo, nextRoad, turnNumber;
     if (this.nextLane) {
       throw Error('next lane is already chosen');
     }
@@ -522,17 +576,17 @@ Car = (function() {
       return null;
     }
     turnNumber = this.trajectory.current.lane.road.getTurnDirection(nextRoad);
-    laneNumber = (function() {
+    laneNo = (function() {
       switch (turnNumber) {
         case 0:
           return nextRoad.lanesNumber - 1;
         case 1:
-          return _.random(0, nextRoad.lanesNumber - 1);
+          return this.trajectory.current.lane.laneIndex;
         case 2:
           return 0;
       }
-    })();
-    this.nextLane = nextRoad.lanes[laneNumber];
+    }).call(this);
+    this.nextLane = nextRoad.lanes[laneNo];
     if (!this.nextLane) {
       throw Error('can not pick next lane');
     }
@@ -609,9 +663,6 @@ ControlSignals = (function() {
     get: function() {
       var stringState, x, _i, _len, _results;
       stringState = this.states[this.stateNum % this.states.length];
-      if (this.intersection.roads.length <= 2) {
-        stringState = ['LFR', 'LFR', 'LFR', 'LFR'];
-      }
       _results = [];
       for (_i = 0, _len = stringState.length; _i < _len; _i++) {
         x = stringState[_i];
@@ -659,6 +710,7 @@ Intersection = (function() {
     this.roads = [];
     this.inRoads = [];
     this.controlSignals = new ControlSignals(this);
+    this.cars = [];
   }
 
   Intersection.copy = function(intersection) {
@@ -795,15 +847,21 @@ _ = require('underscore');
 Segment = require('../geom/segment');
 
 Lane = (function() {
-  function Lane(sourceSegment, targetSegment, road) {
+  function Lane(laneId, sourceSegment, targetSegment, road, laneIndex, canTurnLeft, canTurnRight, canGoStraight) {
+    this.laneId = laneId;
     this.sourceSegment = sourceSegment;
     this.targetSegment = targetSegment;
     this.road = road;
+    this.laneIndex = laneIndex;
+    this.canTurnLeft = canTurnLeft;
+    this.canTurnRight = canTurnRight;
+    this.canGoStraight = canGoStraight != null ? canGoStraight : true;
     this.leftAdjacent = null;
     this.rightAdjacent = null;
     this.leftmostAdjacent = null;
     this.rightmostAdjacent = null;
     this.carsPositions = {};
+    this.carsInLane = {};
     this.update();
   }
 
@@ -1044,7 +1102,7 @@ Road = (function() {
   };
 
   Road.prototype.update = function() {
-    var i, sourceSplits, targetSplits, _base, _i, _j, _ref, _ref1, _results;
+    var canTurnLeft, canTurnRight, i, sourceSplits, targetSplits, _base, _i, _j, _ref, _ref1, _results;
     if (!(this.source && this.target)) {
       throw Error('incomplete road');
     }
@@ -1061,8 +1119,14 @@ Road = (function() {
         this.lanes = [];
       }
       for (i = _i = 0, _ref = this.lanesNumber - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        canTurnLeft = true;
+        canTurnRight = false;
+        if (i === 0) {
+          canTurnLeft = false;
+          canTurnRight = true;
+        }
         if ((_base = this.lanes)[i] == null) {
-          _base[i] = new Lane(sourceSplits[i], targetSplits[i], this);
+          _base[i] = new Lane(this.id + "_lane_" + i, sourceSplits[i], targetSplits[i], this, i, canTurnLeft, canTurnRight, true);
         }
       }
     }
@@ -1192,10 +1256,10 @@ Trajectory = (function() {
     if (turnNumber === 3) {
       throw Error('no U-turns are allowed');
     }
-    if (turnNumber === 0 && !sourceLane.isLeftmost) {
+    if (turnNumber === 0 && !sourceLane.canTurnLeft) {
       throw Error('no left turns from this lane');
     }
-    if (turnNumber === 2 && !sourceLane.isRightmost) {
+    if (turnNumber === 2 && !sourceLane.canTurnRight) {
       throw Error('no right turns from this lane');
     }
     return true;
@@ -1317,6 +1381,8 @@ Trajectory = (function() {
       throw Error('no lane changing is going on');
     }
     this.isChangingLanes = false;
+    delete this.current.lane.carsInLane[this.car.id];
+    this.next.lane.carsInLane[this.car.id] = this.car;
     this.current.lane = this.next.lane;
     this.current.position = this.next.position || 0;
     this.current.acquire();
@@ -1347,10 +1413,10 @@ module.exports = Trajectory;
 
 },{"../geom/curve":2,"../helpers":6,"./lane-position":10,"underscore":32}],15:[function(require,module,exports){
 'use strict';
-var Car, Intersection, Pool, Rect, Road, World, random, settings, _,
+var Car, Intersection, Pool, Rect, Road, World, abs, random, settings, _,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-random = Math.random;
+random = Math.random, abs = Math.abs;
 
 require('../helpers');
 
@@ -1396,7 +1462,10 @@ World = (function() {
     this.intersections = new Pool(Intersection, obj.intersections);
     this.roads = new Pool(Road, obj.roads);
     this.cars = new Pool(Car, obj.cars);
-    return this.carsNumber = 0;
+    this.carsNumber = 0;
+    this.carProducerIntersection = new Pool(Intersection, obj.intersections);
+    this.realIntersection = new Pool(Intersection, obj.intersections);
+    return this.timeFactor = 1;
   };
 
   World.prototype.save = function() {
@@ -1433,7 +1502,7 @@ World = (function() {
   };
 
   World.prototype.generateMap = function(minX, maxX, minY, maxY) {
-    var gridSize, intersection, intersectionsNumber, map, previous, rect, step, x, y, _i, _j, _k, _l;
+    var gridSize, intersection, intersectionsNumber, is_road, map, previous, rect, step, x, y, _i, _j, _k, _l;
     if (minX == null) {
       minX = -2;
     }
@@ -1464,10 +1533,11 @@ World = (function() {
     }
     for (x = _i = minX; minX <= maxX ? _i <= maxX : _i >= maxX; x = minX <= maxX ? ++_i : --_i) {
       previous = null;
+      is_road = 0;
       for (y = _j = minY; minY <= maxY ? _j <= maxY : _j >= maxY; y = minY <= maxY ? ++_j : --_j) {
         intersection = map[[x, y]];
         if (intersection != null) {
-          if (random() < 0.9) {
+          if (abs(is_road - x - y) < 2) {
             if (previous != null) {
               this.addRoad(new Road(intersection, previous));
             }
@@ -1476,15 +1546,17 @@ World = (function() {
             }
           }
           previous = intersection;
+          is_road = x + y;
         }
       }
     }
     for (y = _k = minY; minY <= maxY ? _k <= maxY : _k >= maxY; y = minY <= maxY ? ++_k : --_k) {
       previous = null;
+      is_road = 0;
       for (x = _l = minX; minX <= maxX ? _l <= maxX : _l >= maxX; x = minX <= maxX ? ++_l : --_l) {
         intersection = map[[x, y]];
         if (intersection != null) {
-          if (random() < 0.9) {
+          if (abs(is_road - x - y) < 2) {
             if (previous != null) {
               this.addRoad(new Road(intersection, previous));
             }
@@ -1493,10 +1565,106 @@ World = (function() {
             }
           }
           previous = intersection;
+          is_road = x + y;
         }
       }
     }
     return null;
+  };
+
+  World.prototype.generateCars = function() {
+    return null;
+  };
+
+  World.prototype.generateCrossRoadMap = function() {
+    var gridSize, id, intersection, intersectionNumber, map, step, _ref, _results;
+    this.clear();
+    intersectionNumber = 12;
+    map = {};
+    gridSize = settings.gridSize;
+    step = 5 * gridSize;
+    this.carsNumber = 50;
+    this.addIntersection(map[[0, -1]] = new Intersection(new Rect(step * 0, step * -1, gridSize, gridSize)));
+    this.addIntersection(map[[1, -1]] = new Intersection(new Rect(step * 1, step * -1, gridSize, gridSize)));
+    this.addIntersection(map[[-1, 0]] = new Intersection(new Rect(step * -1, step * 0, gridSize, gridSize)));
+    this.addIntersection(map[[0, 0]] = new Intersection(new Rect(step * 0, step * 0, gridSize, gridSize)));
+    this.addIntersection(map[[1, 0]] = new Intersection(new Rect(step * 1, step * 0, gridSize, gridSize)));
+    this.addIntersection(map[[2, 0]] = new Intersection(new Rect(step * 2, step * 0, gridSize, gridSize)));
+    this.addIntersection(map[[-1, 1]] = new Intersection(new Rect(step * -1, step * 1, gridSize, gridSize)));
+    this.addIntersection(map[[0, 1]] = new Intersection(new Rect(step * 0, step * 1, gridSize, gridSize)));
+    this.addIntersection(map[[1, 1]] = new Intersection(new Rect(step * 1, step * 1, gridSize, gridSize)));
+    this.addIntersection(map[[2, 1]] = new Intersection(new Rect(step * 2, step * 1, gridSize, gridSize)));
+    this.addIntersection(map[[0, 2]] = new Intersection(new Rect(step * 0, step * 2, gridSize, gridSize)));
+    this.addIntersection(map[[1, 2]] = new Intersection(new Rect(step * 1, step * 2, gridSize, gridSize)));
+    this.addRoad(new Road(map[[0, -1]], map[[0, 0]]));
+    this.addRoad(new Road(map[[0, 0]], map[[0, -1]]));
+    this.addRoad(new Road(map[[1, -1]], map[[1, 0]]));
+    this.addRoad(new Road(map[[1, 0]], map[[1, -1]]));
+    this.addRoad(new Road(map[[-1, 0]], map[[0, 0]]));
+    this.addRoad(new Road(map[[0, 0]], map[[-1, 0]]));
+    this.addRoad(new Road(map[[0, 0]], map[[1, 0]]));
+    this.addRoad(new Road(map[[1, 0]], map[[0, 0]]));
+    this.addRoad(new Road(map[[1, 0]], map[[2, 0]]));
+    this.addRoad(new Road(map[[2, 0]], map[[1, 0]]));
+    this.addRoad(new Road(map[[0, 0]], map[[0, 1]]));
+    this.addRoad(new Road(map[[0, 1]], map[[0, 0]]));
+    this.addRoad(new Road(map[[1, 0]], map[[1, 1]]));
+    this.addRoad(new Road(map[[1, 1]], map[[1, 0]]));
+    this.addRoad(new Road(map[[-1, 1]], map[[0, 1]]));
+    this.addRoad(new Road(map[[0, 1]], map[[-1, 1]]));
+    this.addRoad(new Road(map[[0, 1]], map[[1, 1]]));
+    this.addRoad(new Road(map[[1, 1]], map[[0, 1]]));
+    this.addRoad(new Road(map[[1, 1]], map[[2, 1]]));
+    this.addRoad(new Road(map[[2, 1]], map[[1, 1]]));
+    this.addRoad(new Road(map[[0, 1]], map[[0, 2]]));
+    this.addRoad(new Road(map[[0, 2]], map[[0, 1]]));
+    this.addRoad(new Road(map[[1, 1]], map[[1, 2]]));
+    this.addRoad(new Road(map[[1, 2]], map[[1, 1]]));
+    _ref = this.intersections.all();
+    _results = [];
+    for (id in _ref) {
+      intersection = _ref[id];
+      if (intersection.roads.length >= 2) {
+        _results.push(this.realIntersection.put(intersection));
+      } else {
+        _results.push(this.carProducerIntersection.put(intersection));
+      }
+    }
+    return _results;
+  };
+
+  World.prototype.generateSingleCrossRoadMap = function() {
+    var gridSize, id, intersection, map, stepX, stepY, _ref, _results;
+    this.clear();
+    map = {};
+    gridSize = settings.gridSize;
+    stepX = 8 * gridSize;
+    stepY = 4 * gridSize;
+    this.carsNumber = 10;
+    this.addIntersection(map[[-1, 0]] = new Intersection(new Rect(stepX * -1, 0, gridSize, gridSize)));
+    this.addIntersection(map[[0, -1]] = new Intersection(new Rect(0, stepY * -1, gridSize, gridSize)));
+    this.addIntersection(map[[0, 0]] = new Intersection(new Rect(0, 0, gridSize, gridSize)));
+    this.addIntersection(map[[1, 0]] = new Intersection(new Rect(stepX * 1, 0, gridSize, gridSize)));
+    this.addIntersection(map[[0, 1]] = new Intersection(new Rect(0, stepY * 1, gridSize, gridSize)));
+    this.addRoad(new Road(map[[0, -1]], map[[0, 0]]));
+    this.addRoad(new Road(map[[0, 0]], map[[0, -1]]));
+    this.addRoad(new Road(map[[-1, 0]], map[[0, 0]]));
+    this.addRoad(new Road(map[[0, 0]], map[[-1, 0]]));
+    this.addRoad(new Road(map[[0, 0]], map[[1, 0]]));
+    this.addRoad(new Road(map[[1, 0]], map[[0, 0]]));
+    this.addRoad(new Road(map[[0, 0]], map[[0, 1]]));
+    this.addRoad(new Road(map[[0, 1]], map[[0, 0]]));
+    _ref = this.intersections.all();
+    _results = [];
+    for (id in _ref) {
+      intersection = _ref[id];
+      if (intersection.roads.length >= 2) {
+        _results.push(this.realIntersection.put(intersection));
+      } else {
+        _results.push(this.carProducerIntersection.put(intersection));
+      }
+    }
+    return _results;
   };
 
   World.prototype.clear = function() {
@@ -1530,10 +1698,7 @@ World = (function() {
 
   World.prototype.refreshCars = function() {
     if (this.cars.length < this.carsNumber) {
-      this.addRandomCar();
-    }
-    if (this.cars.length > this.carsNumber) {
-      return this.removeRandomCar();
+      return this.addRandomCar1();
     }
   };
 
@@ -1579,6 +1744,23 @@ World = (function() {
     }
   };
 
+  World.prototype.addRandomCar1 = function() {
+    var car, catLength, id, intersection, laneNumber, road, speed, _ref, _results;
+    _ref = this.carProducerIntersection.all();
+    _results = [];
+    for (id in _ref) {
+      intersection = _ref[id];
+      road = _.sample(intersection.roads);
+      laneNumber = _.random(0, road.lanesNumber - 1);
+      speed = _.random(5, 10);
+      catLength = 3 + 2 * random();
+      car = new Car(road.lanes[laneNumber], catLength / 2, speed, catLength);
+      this.addCar(car);
+      _results.push(road.lanes[laneNumber].carsInLane[car.id] = car);
+    }
+    return _results;
+  };
+
   World.prototype.removeRandomCar = function() {
     var car;
     car = _.sample(this.cars.all());
@@ -1600,7 +1782,7 @@ var settings;
 
 settings = {
   colors: {
-    background: '#97a1a1',
+    background: '#fdfdfd',
     redLight: 'hsl(0, 100%, 50%)',
     greenLight: '#85ee00',
     intersection: '#586970',
@@ -1718,6 +1900,38 @@ Graphics = (function() {
     this.moveTo(p1);
     this.lineTo(p2);
     return this.lineTo(p3);
+  };
+
+  Graphics.prototype.drawIntersectionCurve = function(x, y, length, color, alpha) {
+    this.ctx.fillStyle = color;
+    this.ctx.globalAlpha = alpha;
+    this.ctx.beginPath;
+    this.ctx.moveTo(x - length, y);
+    this.ctx.quadraticCurveTo(x, y, x, y - length);
+    this.ctx.lineTo(x, y);
+    this.ctx.fill();
+    this.ctx.closePath();
+    this.ctx.globalAlpha = alpha;
+    this.ctx.beginPath;
+    this.ctx.moveTo(x + length + length, y);
+    this.ctx.quadraticCurveTo(x + length, y, x + length, y - length);
+    this.ctx.lineTo(x + length, y);
+    this.ctx.fill();
+    this.ctx.closePath();
+    this.ctx.globalAlpha = alpha;
+    this.ctx.beginPath;
+    this.ctx.moveTo(x - length, y + length);
+    this.ctx.quadraticCurveTo(x, y + length, x, y + length + length);
+    this.ctx.lineTo(x, y + length);
+    this.ctx.fill();
+    this.ctx.closePath();
+    this.ctx.globalAlpha = alpha;
+    this.ctx.beginPath;
+    this.ctx.moveTo(x + length + length, y + length);
+    this.ctx.quadraticCurveTo(x + length, y + length, x + length, y + length + length);
+    this.ctx.lineTo(x + length, y + length);
+    this.ctx.fill();
+    return this.ctx.closePath();
   };
 
   Graphics.prototype.fill = function(style, alpha) {
@@ -2249,30 +2463,40 @@ Visualizer = (function() {
     return this.graphics.fillRect(intersection.rect, color, alpha);
   };
 
+  Visualizer.prototype.drawIntersectionWithCurve = function(intersection, alpha) {
+    var color, vertices;
+    color = intersection.color || settings.colors.road;
+    this.ctx.lineWidth = 0.4;
+    vertices = intersection.rect.getVertices();
+    return this.graphics.drawIntersectionCurve(vertices[0].x, vertices[0].y, vertices[1].x - vertices[0].x, color, alpha);
+  };
+
   Visualizer.prototype.drawSignals = function(road) {
     var intersection, lights, lightsColors, segment, sideId;
     lightsColors = [settings.colors.redLight, settings.colors.greenLight];
     intersection = road.target;
-    segment = road.targetSide;
-    sideId = road.targetSideId;
-    lights = intersection.controlSignals.state[sideId];
-    this.ctx.save();
-    this.ctx.translate(segment.center.x, segment.center.y);
-    this.ctx.rotate((sideId + 1) * PI / 2);
-    this.ctx.scale(1 * segment.length, 1 * segment.length);
-    if (lights[0]) {
-      this.graphics.drawTriangle(new Point(0.1, -0.2), new Point(0.2, -0.4), new Point(0.3, -0.2));
-      this.graphics.fill(settings.colors.greenLight);
+    if (intersection.roads.length > 2) {
+      segment = road.targetSide;
+      sideId = road.targetSideId;
+      lights = intersection.controlSignals.state[sideId];
+      this.ctx.save();
+      this.ctx.translate(segment.center.x, segment.center.y);
+      this.ctx.rotate((sideId + 1) * PI / 2);
+      this.ctx.scale(1 * segment.length, 1 * segment.length);
+      if (lights[0]) {
+        this.graphics.drawTriangle(new Point(0.1, -0.2), new Point(0.2, -0.4), new Point(0.3, -0.2));
+        this.graphics.fill(settings.colors.greenLight);
+      }
+      if (lights[1]) {
+        this.graphics.drawTriangle(new Point(0.3, -0.1), new Point(0.5, 0), new Point(0.3, 0.1));
+        this.graphics.fill(settings.colors.greenLight);
+      }
+      if (lights[2]) {
+        this.graphics.drawTriangle(new Point(0.1, 0.2), new Point(0.2, 0.4), new Point(0.3, 0.2));
+        this.graphics.fill(settings.colors.greenLight);
+      }
+      return this.ctx.restore();
     }
-    if (lights[1]) {
-      this.graphics.drawTriangle(new Point(0.3, -0.1), new Point(0.5, 0), new Point(0.3, 0.1));
-      this.graphics.fill(settings.colors.greenLight);
-    }
-    if (lights[2]) {
-      this.graphics.drawTriangle(new Point(0.1, 0.2), new Point(0.2, 0.4), new Point(0.3, 0.2));
-      this.graphics.fill(settings.colors.greenLight);
-    }
-    return this.ctx.restore();
   };
 
   Visualizer.prototype.drawRoad = function(road, alpha) {
@@ -2309,19 +2533,17 @@ Visualizer = (function() {
   };
 
   Visualizer.prototype.drawCar = function(car) {
-    var angle, boundRect, center, curve, l, rect, style, _ref;
+    var angle, center, curve, l, rect, style, _ref;
     angle = car.direction;
     center = car.coords;
     rect = new Rect(0, 0, 1.1 * car.length, 1.7 * car.width);
     rect.center(new Point(0, 0));
-    boundRect = new Rect(0, 0, car.length, car.width);
-    boundRect.center(new Point(0, 0));
     this.graphics.save();
     this.ctx.translate(center.x, center.y);
     this.ctx.rotate(angle);
     l = 0.90 - 0.30 * car.speed / car.maxSpeed;
     style = chroma(car.color, 0.8, l, 'hsl').hex();
-    this.graphics.fillRect(boundRect, style);
+    this.graphics.drawImage(this.carImage, rect);
     this.graphics.restore();
     if (this.debug) {
       this.ctx.save();
@@ -2368,7 +2590,7 @@ Visualizer = (function() {
   };
 
   Visualizer.prototype.draw = function(time) {
-    var car, delta, id, intersection, road, _ref, _ref1, _ref2, _ref3;
+    var car, delta, id, intersection, road, _ref, _ref1, _ref2, _ref3, _ref4;
     delta = (time - this.previousTime) || 0;
     if (delta > 30) {
       if (delta > 100) {
@@ -2381,24 +2603,29 @@ Visualizer = (function() {
       this.graphics.save();
       this.zoomer.transform();
       this.drawGrid();
-      _ref = this.world.intersections.all();
+      _ref = this.world.roads.all();
       for (id in _ref) {
-        intersection = _ref[id];
-        this.drawIntersection(intersection, 0.9);
+        road = _ref[id];
+        this.drawRoad(road, 1);
       }
-      _ref1 = this.world.roads.all();
+      _ref1 = this.world.intersections.all();
       for (id in _ref1) {
-        road = _ref1[id];
-        this.drawRoad(road, 0.9);
+        intersection = _ref1[id];
+        this.drawIntersection(intersection, 1);
       }
-      _ref2 = this.world.roads.all();
+      _ref2 = this.world.realIntersection.all();
       for (id in _ref2) {
-        road = _ref2[id];
+        intersection = _ref2[id];
+        this.drawIntersectionWithCurve(intersection, 1);
+      }
+      _ref3 = this.world.roads.all();
+      for (id in _ref3) {
+        road = _ref3[id];
         this.drawSignals(road);
       }
-      _ref3 = this.world.cars.all();
-      for (id in _ref3) {
-        car = _ref3[id];
+      _ref4 = this.world.cars.all();
+      for (id in _ref4) {
+        car = _ref4[id];
         this.drawCar(car);
       }
       this.toolIntersectionBuilder.draw();
@@ -2693,7 +2920,7 @@ module.exports = Zoomer;
 
   Color = (function() {
     function Color() {
-      var a, arg, args, m, me, me_rgb, x, y, z, _i, _len, _ref, _ref1, _ref2, _ref3;
+      var a, arg, args, m, me, me_rgb, x, y, z, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4;
 
       me = this;
       args = [];
@@ -2714,12 +2941,12 @@ module.exports = Zoomer;
         } else {
           throw 'unknown input argument';
         }
-        m = args[1];
+        m = (_ref3 = args[1]) != null ? _ref3 : 'rgb';
       } else if (type(args[0]) === "string") {
         x = args[0];
         m = 'hex';
       } else if (type(args[0]) === "object") {
-        _ref3 = args[0]._rgb, x = _ref3[0], y = _ref3[1], z = _ref3[2], a = _ref3[3];
+        _ref4 = args[0]._rgb, x = _ref4[0], y = _ref4[1], z = _ref4[2], a = _ref4[3];
         m = 'rgb';
       } else if (args.length >= 3) {
         x = args[0];
@@ -2911,12 +3138,12 @@ module.exports = Zoomer;
           hue = hue0 + f * dh;
         } else if (!isNaN(hue0)) {
           hue = hue0;
-          if (lbv1 === 1 || lbv1 === 0) {
+          if ((lbv1 === 1 || lbv1 === 0) && m !== 'hsv') {
             sat = sat0;
           }
         } else if (!isNaN(hue1)) {
           hue = hue1;
-          if (lbv0 === 1 || lbv0 === 0) {
+          if ((lbv0 === 1 || lbv0 === 0) && m !== 'hsv') {
             sat = sat1;
           }
         } else {

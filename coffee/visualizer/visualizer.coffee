@@ -45,40 +45,47 @@ class Visualizer
     @graphics.stroke settings.colors.roadMarking
     @graphics.fillRect intersection.rect, color, alpha
 
+  drawIntersectionWithCurve: (intersection, alpha) ->
+    color = intersection.color or settings.colors.road
+    @ctx.lineWidth = 0.4
+    vertices = intersection.rect.getVertices()
+    @graphics.drawIntersectionCurve vertices[0].x,vertices[0].y,vertices[1].x-vertices[0].x,color,alpha
+
   drawSignals: (road) ->
     lightsColors = [settings.colors.redLight, settings.colors.greenLight]
     intersection = road.target
-    segment = road.targetSide
-    sideId = road.targetSideId
-    lights = intersection.controlSignals.state[sideId]
+    if intersection.roads.length > 2
+      segment = road.targetSide
+      sideId = road.targetSideId
+      lights = intersection.controlSignals.state[sideId]
 
-    @ctx.save()
-    @ctx.translate segment.center.x, segment.center.y
-    @ctx.rotate (sideId + 1) * PI / 2
-    @ctx.scale 1 * segment.length, 1 * segment.length
-    # map lane ending to [(0, -0.5), (0, 0.5)]
-    if lights[0]
-      @graphics.drawTriangle(
-        new Point(0.1, -0.2),
-        new Point(0.2, -0.4),
-        new Point(0.3, -0.2)
-      )
-      @graphics.fill settings.colors.greenLight
-    if lights[1]
-      @graphics.drawTriangle(
-        new Point(0.3, -0.1),
-        new Point(0.5, 0),
-        new Point(0.3, 0.1)
-      )
-      @graphics.fill settings.colors.greenLight
-    if lights[2]
-      @graphics.drawTriangle(
-        new Point(0.1, 0.2),
-        new Point(0.2, 0.4),
-        new Point(0.3, 0.2)
-      )
-      @graphics.fill settings.colors.greenLight
-    @ctx.restore()
+      @ctx.save()
+      @ctx.translate segment.center.x, segment.center.y
+      @ctx.rotate (sideId + 1) * PI / 2
+      @ctx.scale 1 * segment.length, 1 * segment.length
+      # map lane ending to [(0, -0.5), (0, 0.5)]
+      if lights[0]
+        @graphics.drawTriangle(
+          new Point(0.1, -0.2),
+          new Point(0.2, -0.4),
+          new Point(0.3, -0.2)
+        )
+        @graphics.fill settings.colors.greenLight
+      if lights[1]
+        @graphics.drawTriangle(
+          new Point(0.3, -0.1),
+          new Point(0.5, 0),
+          new Point(0.3, 0.1)
+        )
+        @graphics.fill settings.colors.greenLight
+      if lights[2]
+        @graphics.drawTriangle(
+          new Point(0.1, 0.2),
+          new Point(0.2, 0.4),
+          new Point(0.3, 0.2)
+        )
+        @graphics.fill settings.colors.greenLight
+      @ctx.restore()
 
   drawRoad: (road, alpha) ->
     throw Error 'invalid road' if not road.source? or not road.target?
@@ -116,16 +123,16 @@ class Visualizer
     center = car.coords
     rect = new Rect 0, 0, 1.1 * car.length, 1.7 * car.width
     rect.center new Point 0, 0
-    boundRect = new Rect 0, 0, car.length, car.width
-    boundRect.center new Point 0, 0
+#    boundRect = new Rect 0, 0, car.length, car.width
+#    boundRect.center new Point 0, 0
 
     @graphics.save()
     @ctx.translate center.x, center.y
     @ctx.rotate angle
     l = 0.90 - 0.30 * car.speed / car.maxSpeed
     style = chroma(car.color, 0.8, l, 'hsl').hex()
-    # @graphics.drawImage @carImage, rect
-    @graphics.fillRect boundRect, style
+    @graphics.drawImage @carImage, rect
+#    @graphics.fillRect boundRect, style
     @graphics.restore()
     if @debug
       @ctx.save()
@@ -166,9 +173,13 @@ class Visualizer
       @graphics.save()
       @zoomer.transform()
       @drawGrid()
+      @drawRoad road, 1 for id, road of @world.roads.all()
       for id, intersection of @world.intersections.all()
-        @drawIntersection intersection, 0.9
-      @drawRoad road, 0.9 for id, road of @world.roads.all()
+        @drawIntersection intersection, 1
+      for id, intersection of @world.realIntersection.all()
+        @drawIntersectionWithCurve intersection, 1
+
+
       @drawSignals road for id, road of @world.roads.all()
       @drawCar car for id, car of @world.cars.all()
       @toolIntersectionBuilder.draw() # TODO: all tools
@@ -183,6 +194,7 @@ class Visualizer
       if running then @start() else @stop()
 
   start: ->
+#    if !@_running
     unless @_running
       @_running = true
       @draw()

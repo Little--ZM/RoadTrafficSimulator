@@ -64,6 +64,41 @@ class Graphics
     @lineTo p2
     @lineTo p3
 
+  drawIntersectionCurve: (x,y,length,color,alpha) ->
+    @ctx.fillStyle = color
+    @ctx.globalAlpha = alpha
+    @ctx.beginPath
+    @ctx.moveTo x-length ,y
+    @ctx.quadraticCurveTo x,y,x,y-length
+    @ctx.lineTo x,y
+    @ctx.fill()
+    @ctx.closePath()
+
+    @ctx.globalAlpha = alpha
+    @ctx.beginPath
+    @ctx.moveTo x+length+length ,y
+    @ctx.quadraticCurveTo x+length,y,x+length,y-length
+    @ctx.lineTo x+length,y
+    @ctx.fill()
+    @ctx.closePath()
+
+    @ctx.globalAlpha = alpha
+    @ctx.beginPath
+    @ctx.moveTo x-length ,y+length
+    @ctx.quadraticCurveTo x,y+length,x,y+length+length
+    @ctx.lineTo x,y+length
+    @ctx.fill()
+    @ctx.closePath()
+
+    @ctx.globalAlpha = alpha
+    @ctx.beginPath
+    @ctx.moveTo x+length+length ,y+length
+    @ctx.quadraticCurveTo x+length,y+length,x+length,y+length+length
+    @ctx.lineTo x+length,y+length
+    @ctx.fill()
+    @ctx.closePath()
+
+
   fill: (style, alpha) ->
     @ctx.fillStyle = style
     _alpha = @ctx.globalAlpha

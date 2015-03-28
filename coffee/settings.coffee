@@ -2,7 +2,7 @@
 
 settings =
   colors:
-    background: '#97a1a1'
+    background: '#fdfdfd'
     redLight: 'hsl(0, 100%, 50%)'
     greenLight: '#85ee00'
     intersection: '#586970'

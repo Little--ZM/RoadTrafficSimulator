@@ -2,6 +2,7 @@
 
 require '../helpers'
 
+#  分割单位的 类
 class Segment
   constructor: (@source, @target) ->
 

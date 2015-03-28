@@ -6,6 +6,7 @@ _ = require 'underscore'
 Point = require './point'
 Segment = require './segment'
 
+# 交叉口的图形 即一个矩形的类
 class Rect
   constructor: (@x, @y, @_width = 0, @_height = 0) ->
 
@@ -48,9 +49,11 @@ class Rect
       @y = center.y - @height() / 2
     new Point @x + @width() / 2, @y + @height() / 2
 
+#    检测是否包含这个点,检测是否在这个点内
   containsPoint: (point) ->
     @left() <= point.x <= @right() and @top() <= point.y <= @bottom()
 
+#    是否包含模块
   containsRect: (rect) ->
     @left() <= rect.left() and rect.right() <= @right() and
     @top() <= rect.top() and rect.bottom() <= @bottom()
@@ -67,6 +70,13 @@ class Rect
     vertices = @getVertices()
     new Segment vertices[i], vertices[(i + 1) % 4]
 
+
+#
+#    0---1
+#    |   |
+#    |   |
+#    2---3
+#   找出 source 和 target 的 SectorID 就可以确定车的走向
   getSectorId: (point) ->
     offset = point.subtract @center()
     return 0 if offset.y <= 0 and abs(offset.x) <= abs(offset.y)

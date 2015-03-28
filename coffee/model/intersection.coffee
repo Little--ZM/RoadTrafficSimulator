@@ -11,6 +11,8 @@ class Intersection
     @roads = []
     @inRoads = []
     @controlSignals = new ControlSignals this
+#    指的是通过交叉口的车辆的数目 最后根据仿真跑的时间，可以统计出交叉口的流量
+    @cars = []
 
   @copy: (intersection) ->
     intersection.rect = Rect.copy intersection.rect

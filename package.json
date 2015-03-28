@@ -24,7 +24,9 @@
     }
   },
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "liftoff": "^0.13.6"
+  },
   "devDependencies": {
     "blanket": "~1.1",
     "browserify": "~4.1",

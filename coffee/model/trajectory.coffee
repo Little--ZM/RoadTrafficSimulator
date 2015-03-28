@@ -6,9 +6,14 @@ LanePosition = require './lane-position'
 Curve = require '../geom/curve'
 _ = require 'underscore'
 
+# 车辆的轨迹轨迹类 用于判断车辆的各种判断
+# 传入的参数 车辆 车道 车辆所在位置
 class Trajectory
+# 构造函数
   constructor: (@car, lane, position) ->
+#    position如果不存在就定义为0
     position ?= 0
+#    定义当前的 车道位置类 ： 传入参数有 车辆，车道，位置
     @current = new LanePosition @car, lane, position
     @current.acquire()
     @next = new LanePosition @car
@@ -54,10 +59,14 @@ class Trajectory
     throw Error 'no road to enter' unless nextLane
     turnNumber = sourceLane.getTurnDirection nextLane
     throw Error 'no U-turns are allowed' if turnNumber is 3
-    if turnNumber is 0 and not sourceLane.isLeftmost
+    if turnNumber is 0 and not sourceLane.canTurnLeft
       throw Error 'no left turns from this lane'
-    if turnNumber is 2 and not sourceLane.isRightmost
+    if turnNumber is 2 and not sourceLane.canTurnRight
       throw Error 'no right turns from this lane'
+#    if turnNumber is 1
+#      直行道路在交叉口中央的时候不许换道
+#     TODO 当两个路段的道路不一样的时候，可以选择切换车道
+#      return false
     return true
 
   canEnterIntersection: ->
@@ -99,8 +108,10 @@ class Trajectory
     throw Error 'already changing lane' if @isChangingLanes
     throw Error 'no next lane' unless nextLane?
     throw Error 'next lane == current lane' if nextLane is @lane
+#    如果当前的道路与下一条lane的road不是同一条，抛出错误
     throw Error 'not neighbouring lanes' unless @lane.road is nextLane.road
     nextPosition = @current.position + 3 * @car.length
+
     throw Error 'too late to change lane' unless nextPosition < @lane.length
     @_startChangingLanes nextLane, nextPosition
 
@@ -136,6 +147,11 @@ class Trajectory
   _finishChangingLanes: ->
     throw Error 'no lane changing is going on' unless @isChangingLanes
     @isChangingLanes = false
+
+#     將車从旧的lane中移除，放入新的lane中
+    delete @current.lane.carsInLane[@car.id]
+    @next.lane.carsInLane[@car.id] = @car
+
     # TODO swap current and next
     @current.lane = @next.lane
     @current.position = @next.position or 0
