@@ -33,23 +33,54 @@
                         </div>
                     </li>
                     <li class="active">
-                        <a href="#"><i class="fa fa-diamond"></i><span class="nav-label">Home</span></a>
+                        <a href="#home" data-toggle="tab">
+                            <i class="fa fa-diamond"></i> <span class="nav-label">Home</span>
+                        </a>
                     </li>
                     <li>
-                        <a href="#"><i class="fa fa-flask"></i><span class="nav-label">Simulation</span></a>
+                        <a href="#simulation" data-toggle="tab">
+                            <i class="fa fa-flask"></i> <span class="nav-label">Simulation</span>
+                        </a>
                     </li>
                     <li>
-                        <a href="#"><i class="fa fa-bar-chart-o"></i> <span class="nav-label">Result</span><span class="label label-primary pull-right">NEW</span></a>
+                        <a href="#result" data-toggle="tab">
+                            <i class="fa fa-bar-chart-o"></i> <span class="nav-label">Result</span>
+                            <span class="label label-primary pull-right">NEW</span>
+                        </a>
                     </li>
                     <li>
-                        <a href="#"><i class="fa fa-question-circle"></i><span class="nav-label">Help</span></a>
+                        <a href="#help" data-toggle="tab">
+                            <i class="fa fa-question-circle"></i> <span class="nav-label">Help</span>
+                        </a>
                     </li>
                 </ul>
 
             </div>
         </nav>
 
-        <div id="page-wrapper" class="gray-bg dashbard-1">
+        <div id="page-wrapper" class="gray-bg tab-content">
+            <div role="tabpanel" class="tab-pane active" id="home">
+                <div class="row wrapper border-bottom white-bg page-heading">
+                    <div class="col-lg-10">
+                        <h2>Welcome to Tongji Traffic Simulator!</h2>
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="simulation"></div>
+            <div role="tabpanel" class="tab-pane" id="result">
+                <div class="row wrapper border-bottom white-bg page-heading">
+                    <div class="col-lg-10">
+                        <h2>Simulation Result</h2>
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="help">
+                <div class="row wrapper border-bottom white-bg page-heading">
+                    <div class="col-lg-10">
+                        <h2>Help</h2>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
