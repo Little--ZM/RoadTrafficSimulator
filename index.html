@@ -4,6 +4,9 @@
 
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="css/plugins/switchery/switchery.css" rel="stylesheet">
+    <link href="css/plugins/ionRangeSlider/ion.rangeSlider.css" rel="stylesheet">
+    <link href="css/plugins/ionRangeSlider/ion.rangeSlider.skinFlat.css" rel="stylesheet">
 
     <link rel="stylesheet" href="css/style.css" />
     <link rel="icon" href="images/favicon.png" />
@@ -72,10 +75,44 @@
             <div role="tabpanel" class="tab-pane" id="simulation">
                 <div class="row">
                     <div id="simulation-canvas"></div>
-                    <div>param</div>
+                    <div class="simulation-param ibox-content">
+                        <div class="m-b" style="line-height: 32px">
+                            <label for="running">Running</label>
+                            <span class="pull-right">
+                                <input type="checkbox" name="running" class="js-running" checked />
+                            </span>
+                        </div>
+                        <div class="m-b">
+                            <button id="generate-single" class="btn btn-primary">Generate Single</button>
+                        </div>
+                        <div class="m-b">
+                            <button id="generate-complex" class="btn btn-primary">Generate Complex</button>
+                        </div>
+                        <div>
+                            <label for="car_number">Car Number</label>
+                            <div style="display: inline-box">
+                            <input type="text" id="car_number" name="car_number"
+                                data-min="0" data-max="200" data-from-fixed data-from="0" data-to="10" data-type="double"></div>
+                        </div>
+                        <div>
+                            <label for="scale">Scale</label>
+                            <input type="text" id="scale" name="scale"
+                                data-min="0.1" data-max="2" data-from="1" data-type="double">
+                        </div>
+                        <div>
+                            <label for="timeFactor">Time Factor</label>
+                            <input type="text" id="timeFactor" name="timeFactor" value="5"
+                                data-min="0.1" data-max="10" data-step="0.1">
+                        </div>
+                        <div>
+                            <label for="scale">Lights Flip Interval</label>
+                            <input type="text" id="lightsFlipInterval" name="lightsFlipInterval" value="10"
+                                data-min="0" data-max="50" data-step="0.01">
+                        </div>
+                    </div>
                 </div>
                 <div class="row gray-bg simulation-graph">
-                    <div class="col-lg-6">
+                    <div class="col-sm-6">
                         <div class="ibox float-e-margins">
                             <div class="ibox-title">
                                 <h5>Moving Chart</h5>
@@ -87,7 +124,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-sm-6">
                         <div class="ibox float-e-margins">
                             <div class="ibox-title">
                                 <h5>Static Chart</h5>
@@ -133,8 +170,42 @@
     <script src="js/plugins/flot/jquery.flot.pie.js"></script>
     <script src="js/plugins/flot/jquery.flot.time.js"></script>
 
+    <!-- Form -->
+    <script src="js/plugins/switchery/switchery.js"></script>
+    <script src="js/plugins/ionRangeSlider/ion.rangeSlider.min.js"></script>
+    <script src="js/plugins/jsKnob/jquery.knob.js"></script>
+
     <script type="text/javascript">
 $(function() {
+    var world = window.world;
+    var visualizer = window.visualizer;
+    var settings = window.settings;
+
+    var elem = document.querySelector('.js-running');
+    var isRunning = new Switchery(elem, { color: '#1AB394' });
+    elem.addEventListener('change', function () {
+        visualizer.running = this.checked;
+    });
+
+    $('#generate-single').click(function () {
+        world.generateSingleCrossRoadMap();
+    });
+    $('#generate-complex').click(function () {
+        world.generateCrossRoadMap();
+    });
+
+    $('#car_number').ionRangeSlider();
+    $('#car_number').change(function () {
+        alert(this.value);
+    });
+    $('#scale').ionRangeSlider();
+
+    $("#timeFactor").knob({
+        'release' : function (v) { visualizer.timeFactor = v; }
+    });
+    $("#lightsFlipInterval").knob({
+        'release' : function (v) { settings.lightsFlipInterval = v; }
+    });
 
     var container = $("#flot-line-chart-moving");
 
@@ -154,8 +225,7 @@ $(function() {
         }
 
         while (data.length < maximum) {
-            var previous = data.length ? data[data.length - 1] : 50;
-            var y = previous + Math.random() * 10 - 5;
+            var y = world.instantSpeed;
             data.push(y < 0 ? 0 : y > 100 ? 100 : y);
         }
 
@@ -216,7 +286,7 @@ $(function() {
         },
         yaxis: {
             min: 0,
-            max: 110
+            max: 10
         },
         legend: {
             show: true
@@ -229,7 +299,7 @@ $(function() {
         series[0].data = getRandomData();
         plot.setData(series);
         plot.draw();
-    }, 40);
+    }, 1000);
 
 });
 
