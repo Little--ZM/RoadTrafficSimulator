@@ -89,15 +89,12 @@
                             <button id="generate-complex" class="btn btn-primary">Generate Complex</button>
                         </div>
                         <div>
-                            <label for="car_number">Car Number</label>
-                            <div style="display: inline-box">
-                            <input type="text" id="car_number" name="car_number"
-                                data-min="0" data-max="200" data-from-fixed data-from="0" data-to="10" data-type="double"></div>
+                            <label for="cars_number">Cars Number</label>
+                            <input type="text" id="cars_number" name="cars_number" data-min="0" data-max="200" data-from="10">
                         </div>
                         <div>
                             <label for="scale">Scale</label>
-                            <input type="text" id="scale" name="scale"
-                                data-min="0.1" data-max="2" data-from="1" data-type="double">
+                            <input type="text" id="scale" name="scale" data-min="0.1" data-max="2" data-from="1" data-step="0.01">
                         </div>
                         <div>
                             <label for="timeFactor">Time Factor</label>
@@ -194,11 +191,12 @@ $(function() {
         world.generateCrossRoadMap();
     });
 
-    $('#car_number').ionRangeSlider();
-    $('#car_number').change(function () {
-        alert(this.value);
+    $('#cars_number').ionRangeSlider({
+        onChange: function (v) { world.carsNumber = v.from; }
     });
-    $('#scale').ionRangeSlider();
+    $('#scale').ionRangeSlider({
+        onChange: function (v) { visualizer.zoomer.scale = v.from; }
+    });
 
     $("#timeFactor").knob({
         'release' : function (v) { visualizer.timeFactor = v; }
