@@ -32,7 +32,7 @@ gulp.task 'build', ->
   notify('build started')
   b = browserify
     entries: ['./coffee/app.coffee']
-    # transform: ['coffeeify']
+    transform: ['coffeeify']
     extensions: ['.coffee', '.js']
   b
     .transform 'coffeeify'
