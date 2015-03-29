@@ -200,7 +200,7 @@ class World
     map = {}
     gridSize = settings.gridSize
     stepX = 8 * gridSize
-    stepY = 4 * gridSize
+    stepY = 8 * gridSize
     @carsNumber = 10
 
     @addIntersection map[[-1,0]] = new Intersection new Rect stepX * -1, 0, gridSize, gridSize
@@ -289,8 +289,9 @@ class World
       speed = _.random(5,10)
       catLength = 3 + 2 * random()
       car = new Car road.lanes[laneNumber] ,catLength/2 ,speed,catLength
-      @addCar car
-      road.lanes[laneNumber].carsInLane[car.id] = car
+      if car.trajectory.nextCarDistance.distance > catLength/2
+        @addCar car
+        road.lanes[laneNumber].carsInLane[car.id] = car
 
 
 

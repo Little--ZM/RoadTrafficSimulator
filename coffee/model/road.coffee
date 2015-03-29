@@ -50,7 +50,7 @@ class Road
     @targetSide = @target.rect.getSide(@targetSideId).subsegment 0, 0.5
     @lanesNumber = min(@sourceSide.length, @targetSide.length) | 0
 #    设置自己的道路的 车道数
-    @lanesNumber = max 2, @lanesNumber / settings.gridSize | 0
+    @lanesNumber = max 3, @lanesNumber / settings.gridSize | 0
     sourceSplits = @sourceSide.split @lanesNumber, true
     targetSplits = @targetSide.split @lanesNumber
     if not @lanes? or @lanes.length < @lanesNumber

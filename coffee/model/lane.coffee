@@ -86,4 +86,22 @@ class Lane
         next = o
     next
 
+  getNextLanesNextCar: (currentPosition, nextLane) ->
+    bestDistance = Infinity
+    leastDistance = Infinity
+    next = null
+    for id, o of nextLane.carsPositions
+      distance = o.position - currentPosition
+      if not o.free and 0 < distance < bestDistance
+        bestDistance = distance
+        next = o
+      distance = currentPosition - o.position
+      if 0 < distance < leastDistance
+        leastDistance = distance
+
+    if bestDistance > 12 and leastDistance > 20
+      return next
+    return null
+
+
 module.exports = Lane

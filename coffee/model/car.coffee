@@ -20,9 +20,8 @@ class Car
     @trajectory = new Trajectory this, lane, position
     @alive = true
     @preferedLane = null
+    @ChangeLanePosition = null
 
-#   可以换到的距离
-    @canChangeLanePosition = null
 #    行车起始时间
     @beginTime = null
 #    行车结束时间
@@ -45,13 +44,18 @@ class Car
 #     方向
   @property 'direction',
     get: -> @trajectory.direction
+#
+#  @property 'ChangeLanePosition',
+#    get: ->
 
-  getChangeLanePosition: ->
-    if @canChangeLanePosition is null
-      lowLaneLength = @trajectory.current.lane.length * 0.2
-      highLaneLength = @trajectory.current.lane.length * 0.5
-      return @canChangeLanePosition = _.random(lowLaneLength, highLaneLength)
-    return @canChangeLanePosition
+#  @canChangeLanePosition: ->
+#    lowLaneLength =
+#    highLaneLength =
+#
+#    changeLanePosition = _.random(@trajectory.current.lane.length * 0.1, @trajectory.current.lane.length  - 4 * @length)
+#    if @trajectory.absolutePosition > changeLanePosition and @trajectory.absolutePosition < highLaneLength
+#      return true
+#    return false
 
 #  获取时间延误
   getTimeDelay: ->
@@ -68,6 +72,13 @@ class Car
 
 #    获得加速度
   getAcceleration: ->
+    nextCarDistance = null
+#    if @trajectory.isChangingLanes and @nextLane
+#      Distance = @trajectory.getNextCarDistanceinNextLane @nextLane
+#      if Distance.car
+#        nextCarDistance = Distance
+#      else nextCarDistance = @trajectory.nextCarDistance
+#    else
     nextCarDistance = @trajectory.nextCarDistance
     distanceToNextCar = max nextCarDistance.distance, 0
     a = @maxAcceleration
@@ -98,17 +109,19 @@ class Car
       preferedLane = switch turnNumber
         when 0 then @pickLeftLane currentLane
         when 2 then @pickRightLane currentLane
-        else currentLane
-      if preferedLane isnt currentLane and @trajectory.absolutePosition > @getChangeLanePosition()
+        else @pickStraightLane currentLane
+      if @ChangeLanePosition is null
+        @ChangeLanePosition = @trajectory.current.lane.length * 0.1
+      if preferedLane isnt currentLane and @trajectory.absolutePosition > this.ChangeLanePosition and @trajectory.checkRearviewMirror preferedLane
         @trajectory.changeLane preferedLane
 
     step = @speed * delta + 0.5 * acceleration * delta ** 2
 
-#     如果发现下一辆车的距离与小于将要前进的步伐
-    if @trajectory.nextCarDistance.distance < step
-      console.log 'bad IDM'
-      acceleration = @getAcceleration()
-      step = @speed * delta + 0.5 * acceleration * delta ** 2
+##     如果发现下一辆车的距离与小于将要前进的步伐
+#    if @trajectory.nextCarDistance.distance < step
+#      console.log 'bad IDM'
+#      acceleration = @getAcceleration()
+#      step = @speed * delta + 0.5 * acceleration * delta ** 2
 
 
     if @trajectory.timeToMakeTurn(step)
@@ -130,10 +143,17 @@ class Car
       return currentLane
 
   pickStraightLane: (currentLane) ->
+    nextLane = null
     if currentLane.isLeftmost
-      return currentLane.rightAdjacent
+      nextLane=currentLane.rightAdjacent
+    if currentLane.isRightmost
+      nextLane=currentLane.leftAdjacent
+
+    if nextLane and @trajectory.canInitiativeChangeLane nextLane
+      return nextLane
     else
       return currentLane
+
 
 
 #    选择吓一跳道路

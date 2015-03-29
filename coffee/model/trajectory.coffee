@@ -1,6 +1,6 @@
 'use strict'
 
-{min, max} = Math
+{min, max, abs} = Math
 require '../helpers'
 LanePosition = require './lane-position'
 Curve = require '../geom/curve'
@@ -19,6 +19,7 @@ class Trajectory
     @next = new LanePosition @car
     @temp = new LanePosition @car
     @isChangingLanes = false
+    @turnNumber = null
 
   @property 'lane',
     get: -> @temp.lane or @current.lane
@@ -52,16 +53,19 @@ class Trajectory
   @property 'previousIntersection',
     get: -> @current.lane.road.source
 
+  getNextCarDistanceinNextLane: (nextLane) ->
+    @current.getNextCarDistanceinNextLane nextLane
+
   isValidTurn: ->
     #TODO right turn is only allowed from the right lane
     nextLane = @car.nextLane
     sourceLane = @current.lane
     throw Error 'no road to enter' unless nextLane
-    turnNumber = sourceLane.getTurnDirection nextLane
-    throw Error 'no U-turns are allowed' if turnNumber is 3
-    if turnNumber is 0 and not sourceLane.canTurnLeft
+    @turnNumber = sourceLane.getTurnDirection nextLane
+    throw Error 'no U-turns are allowed' if @turnNumber is 3
+    if @turnNumber is 0 and not sourceLane.canTurnLeft
       throw Error 'no left turns from this lane'
-    if turnNumber is 2 and not sourceLane.canTurnRight
+    if @turnNumber is 2 and not sourceLane.canTurnRight
       throw Error 'no right turns from this lane'
 #    if turnNumber is 1
 #      直行道路在交叉口中央的时候不许换道
@@ -91,7 +95,11 @@ class Trajectory
     @next.position += distance
     @temp.position += distance
     if @timeToMakeTurn() and @canEnterIntersection() and @isValidTurn()
-      @_startChangingLanes @car.popNextLane(), 0
+      nextLane = @car.popNextLane()
+      if @turnNumber isnt 1
+        @_startChangingLanes nextLane, 0
+      else
+        @_startChangingLanes nextLane.road[@current.lane.laneIndex], 0
     tempRelativePosition = @temp.position / @temp.lane?.length
     gap = 2 * @car.length
     if @isChangingLanes and @temp.position > gap and not @current.free
@@ -104,15 +112,48 @@ class Trajectory
     if @current.lane and not @isChangingLanes and not @car.nextLane
       @car.pickNextLane()
 
+#  checkRearviewMirror: (nextLane) ->
+#    for id, o of nextLane.carsPositions
+#      if @current.position - o.position  < @car.length
+#        console.log o.car.ChangeLanePosition
+#        console.log @car.ChangeLanePosition
+#        changeLanePositionDistance = o.car.ChangeLanePosition - @car.ChangeLanePosition
+#
+#        if abs changeLanePositionDistance < @car.length/2
+#          return false
+#    return true
+
+  checkRearviewMirror: (nextLane) ->
+    for id, o of nextLane.carsPositions
+      if @current.position > o.position
+        if @current.position - o.position  < @car.length
+          return false
+    return true
+
+  canInitiativeChangeLane: (nextLane) ->
+    nextLaneCarDistance = @current.getNextCarDistanceinNextLane nextLane
+    nextCarDistance = @nextCarDistance
+    return nextLaneCarDistance.distance > nextCarDistance.distance
+
+
+
+  checkRearviewMirrorAndStraight: (nextLane) ->
+    for id, o of nextLane.carsPositions
+      if @current.position > o.position
+        if @current.position - o.position  < @car.length
+          return false
+    return true
+
   changeLane: (nextLane) ->
     throw Error 'already changing lane' if @isChangingLanes
     throw Error 'no next lane' unless nextLane?
     throw Error 'next lane == current lane' if nextLane is @lane
 #    如果当前的道路与下一条lane的road不是同一条，抛出错误
     throw Error 'not neighbouring lanes' unless @lane.road is nextLane.road
-    nextPosition = @current.position + 3 * @car.length
+    nextPosition = @current.position + 2 * @car.length
 
-    throw Error 'too late to change lane' unless nextPosition < @lane.length
+
+    throw Error 'too late to change lane'+ @car.id unless nextPosition < @lane.length
     @_startChangingLanes nextLane, nextPosition
 
   _getIntersectionLaneChangeCurve: ->

@@ -37,6 +37,20 @@ class LanePosition
       @free = true
       @lane.removeCar this
 
+  getNextCarDistanceinNextLane: (nextLane) ->
+#    return @lane.getNextLanesNextCar @position, nextLane
+    next=  @lane.getNextLanesNextCar @position, nextLane
+    if next
+      rearPosition = next.position - next.car.length / 2
+      frontPosition = @position + @car.length / 2
+      return result =
+        car: next.car
+        distance: rearPosition - frontPosition
+    return result =
+      car: null
+      distance: Infinity
+
+
   getNext: ->
     return @lane.getNext this if @lane and not @free
 
