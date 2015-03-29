@@ -40,7 +40,8 @@ class Tool
   draw: ->
 
   getPoint: (e) ->
-    new Point e.pageX - @canvas.offsetLeft, e.pageY - @canvas.offsetTop
+    canvasBound = canvas.getBoundingClientRect()
+    new Point e.pageX - canvasBound.left, e.pageY - canvasBound.top
 
   getCell: (e) ->
     @visualizer.zoomer.toCellCoords @getPoint e

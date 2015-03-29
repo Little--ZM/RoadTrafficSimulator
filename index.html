@@ -1,13 +1,362 @@
 <!DOCTYPE html>
 <head>
     <meta charset="utf-8">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="css/plugins/switchery/switchery.css" rel="stylesheet">
+    <link href="css/plugins/ionRangeSlider/ion.rangeSlider.css" rel="stylesheet">
+    <link href="css/plugins/ionRangeSlider/ion.rangeSlider.skinFlat.css" rel="stylesheet">
+
     <link rel="stylesheet" href="css/style.css" />
     <link rel="icon" href="images/favicon.png" />
     <script src="dist/main.js"></script>
     <link rel="stylesheet" href="css/dat-gui.css" />
-    <title>Road traffic simulator</title>
+    <title>Tongji Traffic Simulator</title>
 </head>
 <body>
+    <div id="wrapper">
+        <nav class="navbar-default navbar-static-side" role="navigation">
+            <div class="sidebar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li class="nav-header">
+                        <div class="dropdown profile-element"> <span>
+                            <img alt="Tongji University" src="images/tongji.jpg" width="100%" />
+                             </span>
+                            <a data-toggle="dropdown" class="dropdown-toggle" href="index.html#">
+                            <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">Tongji Traffic Simulator</strong></span>
+                            <span class="text-muted text-xs block">min.zhu <b class="caret"></b></span> </span> </a>
+                            <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                                <li><a href="profile.html">Profile</a></li>
+                                <li><a href="contacts.html">Contacts</a></li>
+                                <li><a href="mailbox.html">Mailbox</a></li>
+                                <li class="divider"></li>
+                                <li><a href="login.html">Logout</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="active">
+                        <a href="#home" data-toggle="tab">
+                            <i class="fa fa-diamond"></i> <span class="nav-label">Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#simulation" data-toggle="tab">
+                            <i class="fa fa-flask"></i> <span class="nav-label">Simulation</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#result" data-toggle="tab">
+                            <i class="fa fa-bar-chart-o"></i> <span class="nav-label">Result</span>
+                            <span class="label label-primary pull-right">NEW</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#help" data-toggle="tab">
+                            <i class="fa fa-question-circle"></i> <span class="nav-label">Help</span>
+                        </a>
+                    </li>
+                </ul>
 
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="gray-bg tab-content">
+            <!-- Home Page -->
+            <div role="tabpanel" class="tab-pane active" id="home">
+                <div class="row wrapper border-bottom white-bg page-heading">
+                    <div class="col-lg-10">
+                        <h2>Welcome to Tongji Traffic Simulator!</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulation Page -->
+            <div role="tabpanel" class="tab-pane" id="simulation">
+                <div class="row">
+                    <div id="simulation-canvas"></div>
+                    <div class="simulation-param ibox-content">
+                        <div class="m-b" style="line-height: 32px">
+                            <label for="running">Running</label>
+                            <span class="pull-right">
+                                <input type="checkbox" name="running" class="js-running" checked />
+                            </span>
+                        </div>
+                        <div class="m-b">
+                            <label>Generate</label>
+                            <button id="generate-single" class="btn btn-sm btn-primary">Single</button>
+                            <button id="generate-complex" class="btn btn-sm btn-primary">Complex</button>
+                        </div>
+                        <div class="m-b">
+                            <label>Cars Number</label>
+                            <input type="text" id="cars_number" data-min="0" data-max="200" data-from="10">
+                        </div>
+                        <div class="m-b">
+                            <label>Scale</label>
+                            <input type="text" id="scale" data-min="0.1" data-max="2" data-from="1" data-step="0.01">
+                        </div>
+                        <div class="m-b">
+                            <label>Time Factor</label>
+                            <br>
+                            <input type="text" id="timeFactor" value="5"
+                                data-min="0.1" data-max="10" data-step="0.1" data-width="85" data-height="85">
+                        </div>
+                        <div class="m-b">
+                            <label>Lights Flip Interval</label>
+                            <br>
+                            <input type="text" id="lightsFlipIntervalGreen" value="10" data-fgcolor="#1AB394"
+                                data-min="0" data-max="50" data-step="0.01" data-width="85" data-height="85">
+                            <input type="text" id="lightsFlipIntervalRed" value="10" data-fgcolor="#ED5565"
+                                data-min="0" data-max="50" data-step="0.01" data-width="85" data-height="85">
+                        </div>
+                    </div>
+                </div>
+                <div class="row gray-bg simulation-graph">
+                    <div class="col-sm-6">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5>Moving Chart</h5>
+                            </div>
+                            <div class="ibox-content">
+                                <div class="flot-chart">
+                                    <div class="flot-chart-content" id="flot-line-chart-moving"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5>Static Chart</h5>
+                            </div>
+                            <div class="ibox-content">
+                                <div class="flot-chart">
+                                    <div class="flot-chart-content" id="flot-bar-chart"></div>
+                                </div>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Page -->
+            <div role="tabpanel" class="tab-pane" id="result">
+                <div class="row wrapper border-bottom white-bg page-heading">
+                    <div class="col-lg-10">
+                        <h2>Simulation Result</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Page -->
+            <div role="tabpanel" class="tab-pane" id="help">
+                <div class="row wrapper border-bottom white-bg page-heading">
+                    <div class="col-lg-10">
+                        <h2>Help</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mainly scripts -->
+    <script src="js/jquery-2.1.1.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Flot -->
+    <script src="js/plugins/flot/jquery.flot.js"></script>
+    <script src="js/plugins/flot/jquery.flot.tooltip.min.js"></script>
+    <script src="js/plugins/flot/jquery.flot.resize.js"></script>
+    <script src="js/plugins/flot/jquery.flot.pie.js"></script>
+    <script src="js/plugins/flot/jquery.flot.time.js"></script>
+
+    <!-- Form -->
+    <script src="js/plugins/switchery/switchery.js"></script>
+    <script src="js/plugins/ionRangeSlider/ion.rangeSlider.min.js"></script>
+    <script src="js/plugins/jsKnob/jquery.knob.js"></script>
+
+    <script type="text/javascript">
+$(function() {
+    var world = window.world;
+    var visualizer = window.visualizer;
+    var settings = window.settings;
+
+    var elem = document.querySelector('.js-running');
+    var isRunning = new Switchery(elem, { color: '#1AB394' });
+    elem.addEventListener('change', function () {
+        visualizer.running = this.checked;
+    });
+
+    $('#generate-single').click(function () {
+        world.generateSingleCrossRoadMap();
+    });
+    $('#generate-complex').click(function () {
+        world.generateCrossRoadMap();
+    });
+
+    $('#cars_number').ionRangeSlider({
+        onChange: function (v) { world.carsNumber = v.from; }
+    });
+    $('#scale').ionRangeSlider({
+        onChange: function (v) { visualizer.zoomer.scale = v.from; }
+    });
+
+    $("#timeFactor").knob({
+        'release' : function (v) { visualizer.timeFactor = v; }
+    });
+    $("#lightsFlipIntervalGreen").knob({
+        'release' : function (v) { settings.lightsFlipInterval = v; }
+    });
+    $("#lightsFlipIntervalRed").knob({
+        'release' : function (v) { settings.lightsFlipInterval = v; }
+    });
+
+    var container = $("#flot-line-chart-moving");
+
+    // Determine how many data points to keep based on the placeholder's initial size;
+    // this gives us a nice high-res plot while avoiding more than one point per pixel.
+
+    var maximum = container.outerWidth() / 2 || 300;
+
+    //
+
+    var data = [];
+
+    function getRandomData() {
+
+        if (data.length) {
+            data = data.slice(1);
+        }
+
+        while (data.length < maximum) {
+            var y = world.instantSpeed;
+            data.push(y < 0 ? 0 : y > 100 ? 100 : y);
+        }
+
+        // zip the generated y values with the x values
+
+        var res = [];
+        for (var i = 0; i < data.length; ++i) {
+            res.push([i, data[i]])
+        }
+
+        return res;
+    }
+
+    series = [{
+        data: getRandomData(),
+        lines: {
+            fill: true
+        }
+    }];
+
+
+    var plot = $.plot(container, series, {
+        grid: {
+
+            color: "#999999",
+            tickColor: "#D4D4D4",
+            borderWidth:0,
+            minBorderMargin: 20,
+            labelMargin: 10,
+            backgroundColor: {
+                colors: ["#ffffff", "#ffffff"]
+            },
+            margin: {
+                top: 8,
+                bottom: 20,
+                left: 20
+            },
+            markings: function(axes) {
+                var markings = [];
+                var xaxis = axes.xaxis;
+                for (var x = Math.floor(xaxis.min); x < xaxis.max; x += xaxis.tickSize * 2) {
+                    markings.push({
+                        xaxis: {
+                            from: x,
+                            to: x + xaxis.tickSize
+                        },
+                        color: "#fff"
+                    });
+                }
+                return markings;
+            }
+        },
+        colors: ["#1ab394"],
+        xaxis: {
+            tickFormatter: function() {
+                return "";
+            }
+        },
+        yaxis: {
+            min: 0,
+            max: 10
+        },
+        legend: {
+            show: true
+        }
+    });
+
+    // Update the random dataset at 25FPS for a smoothly-animating chart
+
+    setInterval(function updateRandom() {
+        series[0].data = getRandomData();
+        plot.setData(series);
+        plot.draw();
+    }, 1000);
+
+});
+
+$(function() {
+    var barOptions = {
+        series: {
+            bars: {
+                show: true,
+                barWidth: 0.6,
+                fill: true,
+                fillColor: {
+                    colors: [{
+                        opacity: 0.8
+                    }, {
+                        opacity: 0.8
+                    }]
+                }
+            }
+        },
+        xaxis: {
+            tickDecimals: 0
+        },
+        colors: ["#1ab394"],
+        grid: {
+            color: "#999999",
+            hoverable: true,
+            clickable: true,
+            tickColor: "#D4D4D4",
+            borderWidth:0
+        },
+        legend: {
+            show: false
+        },
+        tooltip: true,
+        tooltipOpts: {
+            content: "x: %x, y: %y"
+        }
+    };
+    var barData = {
+        label: "bar",
+        data: [
+            [1, 34],
+            [2, 25],
+            [3, 19],
+            [4, 34],
+            [5, 32],
+            [6, 44]
+        ]
+    };
+    $.plot($("#flot-bar-chart"), [barData], barOptions);
+
+});
+
+    </script>
 </body>
 </html>
