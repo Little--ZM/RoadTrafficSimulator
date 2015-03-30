@@ -22,6 +22,13 @@ class World
       return 0 if speeds.length is 0
       return (_.reduce speeds, (a, b) -> a + b) / speeds.length
 
+  @property 'instantDelay'
+    get: ->
+      if @totalDelayCarsNum isnt 0
+        return @totalDelay/@totalDelayCarsNum
+      return 0
+
+
 #    环境设定
   set: (obj) ->
 #    定义一个map
@@ -40,6 +47,9 @@ class World
     @realIntersection = new Pool Intersection, obj.intersections
 
     @timeFactor = 1
+
+    @totalDelay = 0
+    @totalDelayCarsNum = 0
 
   save: ->
 #    将this中的对象全部都放入 {} 中
@@ -244,7 +254,11 @@ class World
       intersection.controlSignals.onTick delta
     for id, car of @cars.all()
       car.move delta
-      @removeCar car unless car.alive
+      if !car.alive
+#        添加延误时间。
+        @totalDelay = car.stopTime - car.beginTime - car.distance / car.maxSpeed
+        @totalDelayCarsNum += 1
+        @removeCar car
 
   refreshCars: ->
     @addRandomCar1() if @cars.length < @carsNumber
@@ -289,9 +303,12 @@ class World
       speed = _.random(5,10)
       catLength = 3 + 2 * random()
       car = new Car road.lanes[laneNumber] ,catLength/2 ,speed,catLength
-      if car.trajectory.nextCarDistance.distance > catLength/2
+      if car.trajectory.nextCarDistance.distance > catLength
         @addCar car
         road.lanes[laneNumber].carsInLane[car.id] = car
+      else
+        car.release()
+
 
 
 

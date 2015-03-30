@@ -61,7 +61,7 @@ class Trajectory
     nextLane = @car.nextLane
     sourceLane = @current.lane
     throw Error 'no road to enter' unless nextLane
-    @turnNumber = sourceLane.getTurnDirection nextLane
+#    @turnNumber = sourceLane.getTurnDirection nextLane
     throw Error 'no U-turns are allowed' if @turnNumber is 3
     if @turnNumber is 0 and not sourceLane.canTurnLeft
       throw Error 'no left turns from this lane'
@@ -78,9 +78,9 @@ class Trajectory
     sourceLane = @current.lane
     return true unless nextLane
     intersection = @nextIntersection
-    turnNumber = sourceLane.getTurnDirection nextLane
+#    turnNumber = sourceLane.getTurnDirection nextLane
     sideId = sourceLane.road.targetSideId
-    intersection.controlSignals.state[sideId][turnNumber]
+    intersection.controlSignals.state[sideId][@turnNumber]
 
   getDistanceToIntersection: ->
     distance = @current.lane.length - @car.length / 2 - @current.position
@@ -96,10 +96,11 @@ class Trajectory
     @temp.position += distance
     if @timeToMakeTurn() and @canEnterIntersection() and @isValidTurn()
       nextLane = @car.popNextLane()
+#      @_startChangingLanes nextLane, 0
       if @turnNumber isnt 1
         @_startChangingLanes nextLane, 0
       else
-        @_startChangingLanes nextLane.road[@current.lane.laneIndex], 0
+        @_startChangingLanes nextLane.road.lanes[@current.lane.laneIndex], 0
     tempRelativePosition = @temp.position / @temp.lane?.length
     gap = 2 * @car.length
     if @isChangingLanes and @temp.position > gap and not @current.free
@@ -126,7 +127,7 @@ class Trajectory
   checkRearviewMirror: (nextLane) ->
     for id, o of nextLane.carsPositions
       if @current.position > o.position
-        if @current.position - o.position  < @car.length
+        if 0 < @current.position - o.position  < @car.length
           return false
     return true
 
@@ -174,7 +175,7 @@ class Trajectory
 
   _startChangingLanes: (nextLane, nextPosition) ->
     throw Error 'already changing lane' if @isChangingLanes
-    throw Error 'no next lane' unless nextLane?
+    throw Error 'no next lane ' + nextLane.toJSON() unless nextLane?
     @isChangingLanes = true
     @next.lane = nextLane
     @next.position = nextPosition

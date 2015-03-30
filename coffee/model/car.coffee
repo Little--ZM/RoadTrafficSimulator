@@ -23,7 +23,7 @@ class Car
     @ChangeLanePosition = null
 
 #    行车起始时间
-    @beginTime = null
+    @beginTime = 0
 #    行车结束时间
     @stopTime = null
 #    车辆的行程
@@ -104,16 +104,20 @@ class Car
 
     if not @trajectory.isChangingLanes and @nextLane
       currentLane = @trajectory.current.lane
-      turnNumber = currentLane.getTurnDirection @nextLane
+#      turnNumber = currentLane.getTurnDirection @nextLane
 #      根据转向来将选择的道路来进行
-      preferedLane = switch turnNumber
+      preferedLane = switch @trajectory.turnNumber
         when 0 then @pickLeftLane currentLane
         when 2 then @pickRightLane currentLane
         else @pickStraightLane currentLane
       if @ChangeLanePosition is null
-        @ChangeLanePosition = @trajectory.current.lane.length * 0.1
-      if preferedLane isnt currentLane and @trajectory.absolutePosition > this.ChangeLanePosition and @trajectory.checkRearviewMirror preferedLane
-        @trajectory.changeLane preferedLane
+#        @ChangeLanePosition = @trajectory.current.lane.length * 0.1
+        @ChangeLanePosition = _.random(@trajectory.current.lane.length * 0.1, currentLane.length - 5 * @length)
+      if preferedLane isnt currentLane and @trajectory.absolutePosition > this.ChangeLanePosition
+        if @trajectory.checkRearviewMirror preferedLane
+          @trajectory.changeLane preferedLane
+        else if @trajectory.absolutePosition > currentLane.length - 3.5 * @length
+          @trajectory.changeLane preferedLane
 
     step = @speed * delta + 0.5 * acceleration * delta ** 2
 
@@ -123,7 +127,7 @@ class Car
 #      acceleration = @getAcceleration()
 #      step = @speed * delta + 0.5 * acceleration * delta ** 2
 
-
+#     如果没有下一条路了，则选择没有
     if @trajectory.timeToMakeTurn(step)
       return @alive = false if not @nextLane?
 
@@ -137,7 +141,7 @@ class Car
       return currentLane
 
   pickRightLane: (currentLane) ->
-    if not currentLane.isRightmost
+    if not currentLane.canTurnRight
       return currentLane.rightAdjacent
     else
       return currentLane
@@ -159,27 +163,28 @@ class Car
 #    选择吓一跳道路
   pickNextRoad: ->
     intersection = @trajectory.nextIntersection
+    @nextRoad = null
     currentLane = @trajectory.current.lane
 #    选取可能去的下一个交叉口，这个交叉口是当前交叉口连接的交叉口中挑选。当然，去除了当前的交叉口
     possibleRoads = intersection.roads.filter (x) ->
       x.target isnt currentLane.road.source
     return null if possibleRoads.length is 0
-    nextRoad = _.sample possibleRoads
+    @nextRoad = _.sample possibleRoads
 
 #  这里的下一条车道指的是 下一条道路中的想要选择的车道
   pickNextLane: ->
     throw Error 'next lane is already chosen' if @nextLane
     @nextLane = null
-    nextRoad = @pickNextRoad()
-    return null if not nextRoad
+    @nextRoad = @pickNextRoad()
+    return null if not @nextRoad
     # throw Error 'can not pick next road' if not nextRoad
-    turnNumber = @trajectory.current.lane.road.getTurnDirection nextRoad
+    @trajectory.turnNumber = @trajectory.current.lane.road.getTurnDirection @nextRoad
     # 0 - left, 1 - forward, 2 - right
-    laneNo = switch turnNumber
-      when 0 then nextRoad.lanesNumber - 1
+    laneNo = switch @trajectory.turnNumber
+      when 0 then @nextRoad.lanesNumber - 1
       when 1 then @trajectory.current.lane.laneIndex
       when 2 then 0
-    @nextLane = nextRoad.lanes[laneNo]
+    @nextLane = @nextRoad.lanes[laneNo]
     throw Error 'can not pick next lane' if not @nextLane
     return @nextLane
 
