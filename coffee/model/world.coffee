@@ -22,11 +22,10 @@ class World
       return 0 if speeds.length is 0
       return (_.reduce speeds, (a, b) -> a + b) / speeds.length
 
-  @property 'instantDelay'
+  @property 'instantDelay',
     get: ->
-      if @totalDelayCarsNum isnt 0
-        return @totalDelay/@totalDelayCarsNum
-      return 0
+      return 0 if @totalDelayCarsNum is 0
+      return @totalDelay/@totalDelayCarsNum
 
 
 #    环境设定
@@ -200,6 +199,7 @@ class World
       if intersection.roads.length >= 2
         @realIntersection.put intersection
       else
+        intersection.generateCar = true
         @carProducerIntersection.put intersection
 
 
@@ -240,6 +240,7 @@ class World
       if intersection.roads.length >= 2
         @realIntersection.put intersection
       else
+        intersection.generateCar = true
         @carProducerIntersection.put intersection
 
 
@@ -247,7 +248,7 @@ class World
   clear: ->
     @set {}
 
-  onTick: (delta) =>
+  onTick: (delta, timeFactor) =>
     throw Error 'delta > 1' if delta > 1
     @refreshCars()
     for id, intersection of @intersections.all()
@@ -256,7 +257,8 @@ class World
       car.move delta
       if !car.alive
 #        添加延误时间。
-        @totalDelay = car.stopTime - car.beginTime - car.distance / car.maxSpeed
+        realTimeSpeed = car.stopTime - car.beginTime
+        @totalDelay += realTimeSpeed - car.distance / (car.maxSpeed * timeFactor)
         @totalDelayCarsNum += 1
         @removeCar car
 

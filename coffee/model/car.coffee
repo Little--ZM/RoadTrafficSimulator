@@ -23,9 +23,9 @@ class Car
     @ChangeLanePosition = null
 
 #    行车起始时间
-    @beginTime = 0
+    @beginTime = Date.now()/1000
 #    行车结束时间
-    @stopTime = null
+    @stopTime = 0
 #    车辆的行程
     @distance = 0.0
 
@@ -116,7 +116,7 @@ class Car
       if preferedLane isnt currentLane and @trajectory.absolutePosition > this.ChangeLanePosition
         if @trajectory.checkRearviewMirror preferedLane
           @trajectory.changeLane preferedLane
-        else if @trajectory.absolutePosition > currentLane.length - 3.5 * @length
+        else if @trajectory.absolutePosition > currentLane.length - 4 * @length
           @trajectory.changeLane preferedLane
 
     step = @speed * delta + 0.5 * acceleration * delta ** 2
@@ -129,7 +129,9 @@ class Car
 
 #     如果没有下一条路了，则选择没有
     if @trajectory.timeToMakeTurn(step)
-      return @alive = false if not @nextLane?
+      if not @nextLane?
+        @stopTime = Date.now()/1000
+        return @alive = false
 
     @distance += step
     @trajectory.moveForward step

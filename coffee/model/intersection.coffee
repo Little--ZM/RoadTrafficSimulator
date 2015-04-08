@@ -11,9 +11,32 @@ class Intersection
     @roads = []
     @inRoads = []
     @controlSignals = new ControlSignals this
+#    根据交叉口的信号灯周期，计算排队排毒周期
+    @carStayInLaneMapByCycle = {}
 #    指的是通过交叉口的车辆的数目 最后根据仿真跑的时间，可以统计出交叉口的流量
-    @cars = []
+    @carThroughIntersectionMapByCycle = {}
+#    指的是最大通行能力，指的在使用
+    @maxCPA = 0
+    @CycleNum = 0
+    @avragelineCars = 0
+    @generateCar = false
 
+#  用于计算当前当前周期交叉口排队长度 最大排队长度是每条车道上的车辆数
+  caculatorCarInLane: (CycleNum) ->
+    if @CycleNum+1 is CycleNum
+      @carStayInLaneMapByCycle[@CycleNum] = @avragelineCars / (@roads[0].lanesNumber * 4)
+      console.log  @carStayInLaneMapByCycle[@CycleNum]
+      console.log  @CycleNum
+      console.log  @avragelineCars
+      @avragelineCars = 0
+      @CycleNum = CycleNum
+    for road in @inRoads
+      if @controlSignals.state[road.targetSideId][0] is 1
+        for lane in road.lanes
+          @avragelineCars += lane.carsPositions.size
+
+
+#   平均排队车辆数是指一个信号周期内各车道最大排队车辆数的平均值
   @copy: (intersection) ->
     intersection.rect = Rect.copy intersection.rect
     result = Object.create Intersection::

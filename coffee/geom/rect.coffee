@@ -58,6 +58,7 @@ class Rect
     @left() <= rect.left() and rect.right() <= @right() and
     @top() <= rect.top() and rect.bottom() <= @bottom()
 
+#    用于获取rect的四角
   getVertices: ->
     [
       new Point(@left(), @top()),

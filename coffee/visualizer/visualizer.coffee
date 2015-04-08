@@ -167,7 +167,7 @@ class Visualizer
     if delta > 30
       delta = 100 if delta > 100
       @previousTime = time
-      @world.onTick @timeFactor * delta / 1000
+      @world.onTick @timeFactor * delta / 1000, @timeFactor
       @updateCanvasSize()
       @graphics.clear settings.colors.background
       @graphics.save()
