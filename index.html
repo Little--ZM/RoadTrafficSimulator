@@ -5,11 +5,11 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
     <link href="css/plugins/switchery/switchery.css" rel="stylesheet">
-    <link href="css/plugins/ionRangeSlider/ion.rangeSlider.skinHTML5.css" rel="stylesheet">
     <link href="css/plugins/ionRangeSlider/ion.rangeSlider.css" rel="stylesheet">
-    <!--<link href="css/plugins/ionRangeSlider/ion.rangeSlider.skinFlat.css" rel="stylesheet">-->
+    <link href="css/plugins/ionRangeSlider/ion.rangeSlider.skinHTML5.css" rel="stylesheet">
 
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/simulator.css" /><!--自定义样式-->
     <link rel="icon" href="images/favicon.png" />
     <script src="dist/main.js"></script>
     <link rel="stylesheet" href="css/dat-gui.css" />
@@ -74,28 +74,39 @@
                 <div>
                     <div class="row">
                         <div class="col-lg-8">
-                        <div class="ibox float-e-margins">
-                            <div class="ibox-title">
-                                <h5>地图选择设置</h5>
-                                <span class="label label-primary pull-right">Map Related</span>
-                            </div>
-                            <div class="ibox-content">
-                                <p>
-                                    选择生成的地图样式 <code>地图样式</code>
-                                </p>
-                                <button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">
-                                    单交叉口 +
-                                </button>
-                                <!--<button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">-->
-                                    <!--井字形交叉口 #-->
-                                <!--</button>-->
-                                <!--<button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">-->
-                                    <!--干线四交叉口 -+-+-+-+--->
-                                <!--</button>-->
-
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <h5>地图选择设置</h5>
+                                    <span class="label label-primary pull-right">Map Related</span>
+                                    <!-- Nav tabs -->
+                                    <ul class="nav nav-tabs title-nav-tabs pull-right">
+                                        <li class="active"><a href="#preset-map" data-toggle="tab">预设地图</a></li>
+                                        <li><a href="#custom-map" data-toggle="tab">自定义地图</a></li>
+                                    </ul>
+                                </div>
+                                <div class="ibox-content">
+                                    <!-- Tab panes -->
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="preset-map">
+                                            <p>选择生成的地图样式 <code>地图样式</code></p>
+                                            <button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">
+                                                单交叉口 +
+                                            </button>
+                                            <!--<button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">-->
+                                                <!--井字形交叉口 #-->
+                                            <!--</button>-->
+                                            <!--<button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">-->
+                                                <!--干线四交叉口 -+-+-+-+--->
+                                            <!--</button>-->
+                                        </div>
+                                        <div class="tab-pane" id="custom-map">
+                                            <button type="button" id="edit-map" class="btn btn-primary">编辑地图</button>
+                                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#load-json-map-modal">加载JSON格式地图</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
                         <div class="col-lg-4">
                             <div class="ibox float-e-margins">
@@ -181,6 +192,8 @@
                             <div class="ibox-content">
                                 <div class="row form-group">
                                     <div class="col-sm-3">
+                                        <label class="control-label">选择路口</label>
+                                        <select id="signal-control-intersection" class="form-control"></select>
                                         <label class="control-label">定时控制</label>
                                         <p><code>信号周期</code></p>
                                         <input id="signal-cycle" type="number" class="form-control" placeholder="信号周期 ...">
@@ -188,7 +201,6 @@
                                         <p><code>黄灯时间</code></p>
                                         <input id="yellow-time" type="number" class="form-control" placeholder="黄灯时间 ...">
                                         <br>
-                                        <button id="set-signal" class="btn btn-success " type="button" onclick="set_signal()"><i class="fa fa-upload"></i>&nbsp;&nbsp;<span class="bold">Submit</span></button>
                                     </div>
                                     <div class="col-sm-9">
                                         <div class="row">
@@ -364,14 +376,32 @@
         </div>
     </div>
 
+    <div class="modal fade" id="load-json-map-modal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">加载JSON格式地图</h4>
+          </div>
+          <div class="modal-body">
+            <textarea class="load-json-map-textarea"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary" id="load-json-map-btn">加载</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <link rel="stylesheet" href="css/custom.css" />
     <link rel="stylesheet" href="css/animate.css" />
     <link rel="stylesheet" media="screen" href="css/plugins/handsonTable/handsontable.full.css">
 
-    <script src="js/inspinia.js"></script>
+<!--    <script src="js/inspinia.js"></script>-->
 
     <!-- Mainly scripts -->
+    <script src="js/underscore-1.8.3.js"></script>
     <script src="js/jquery-2.1.1.js"></script>
     <script src="js/bootstrap.min.js"></script>
 
@@ -596,27 +626,6 @@ var circle_time = 150;
 var yellow_time = 2;
 var single_array = [];
 
-function set_signal() {
-
-    circle_time =  $("#signal-cycle").val();
-    yellow_time = $("#yellow-time").val();
-
-    $("#signal1").data("ionRangeSlider").update({
-        max: circle_time
-    });
-    $("#signal2").data("ionRangeSlider").update({
-        max: circle_time
-    });
-    $("#signal3").data("ionRangeSlider").update({
-        max: circle_time
-    });
-    $("#signal4").data("ionRangeSlider").update({
-        max: circle_time
-    });
-
-}
-
-
 $(function(){
 
 
@@ -698,7 +707,59 @@ $(function(){
 
 });
 
+$(function() {
+    window.jsonMap = {};
+    var selectIntersection = $('#signal-control-intersection');
+    function loadSelectedIntersection() {
+        var intersectionId = selectIntersection.find(':selected').val();
+        var controlSignals = window.jsonMap.intersections[intersectionId].controlSignals;
 
+        $('#signal-cycle').val(controlSignals.cycleTime);
+        $('#signal-cycle').off().change(function() {
+            controlSignals.cycleTime = $(this).val();
+            _.each([1, 2, 3, 4], function(d) {
+                var slider = $('#signal' + d).data("ionRangeSlider");
+                slider.update({max: controlSignals.cycleTime});
+            });
+            $('#signal4').data("ionRangeSlider").update({to: controlSignals.cycleTime});
+        });
+        $('#yellow-time').val(controlSignals.yellowTime);
+        $('#yellow-time').off().change(function() {
+            controlSignals.yellowTime = $(this).val();
+        });
+
+        _.each([1, 2, 3, 4], function(d, i) {
+            var slider = $('#signal' + d).data("ionRangeSlider");
+            slider.update({
+                from: controlSignals.timeSettings[i].start,
+                to: controlSignals.timeSettings[i].end,
+                max: controlSignals.cycleTime
+            });
+            slider.onFinish = function(data) {
+                var nextSlider = $('#signal' + (d + 1)).data('ionRangeSlider');
+                if (!!nextSlider) {
+                    slider.update({from: data.to + controlSignals.yellowTime});
+                }
+                controlSignals.timeSettings[i].start = data.from;
+                controlSignals.timeSettings[i].end = data.to;
+            }
+        });
+    }
+    function loadIntersections() {
+        selectIntersection.html('');
+        _.each(window.jsonMap.intersections, function(intersection) {
+            selectIntersection.append($('<option>', {value: intersection.id, text: intersection.id}));
+        });
+        selectIntersection.first('option').prop("selected", true);
+        loadSelectedIntersection();
+    }
+    selectIntersection.change(loadSelectedIntersection);
+    $('#load-json-map-btn').click(function() {
+        window.jsonMap = JSON.parse($('#load-json-map-modal textarea').val());
+        loadIntersections();
+        $('#load-json-map-modal').modal('hide');
+    });
+});
     </script>
 </body>
 </html>

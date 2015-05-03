@@ -42,14 +42,39 @@ class Visualizer
     color = intersection.color or settings.colors.intersection
     @graphics.drawRect intersection.rect
     @ctx.lineWidth = 0.4
-    @graphics.stroke settings.colors.roadMarking
+    @graphics.stroke color
     @graphics.fillRect intersection.rect, color, alpha
+    for road in intersection.inRoads
+      leftLine = road.leftmostLane.leftBorder
+      rightLine = road.rightmostLane.rightBorder
+      percent = settings.stopLineGap / leftLine.length
+      @graphics.drawLine leftLine.getPoint(1 - percent), rightLine.getPoint(1 - percent)
+      @graphics.stroke settings.colors.roadMarking
+#    vertices = intersection.rect.getVertices()
+#    for j, i in [1, 2, 3, 0]
+#      @graphics.drawLine vertices[i], vertices[i].add (vertices[j].subtract vertices[i]).mult 0.5
+#      @ctx.closePath()
+#      @graphics.stroke settings.colors.roadMarking
 
   drawIntersectionWithCurve: (intersection, alpha) ->
     color = intersection.color or settings.colors.road
     @ctx.lineWidth = 0.4
     vertices = intersection.rect.getVertices()
-    @graphics.drawIntersectionCurve vertices[0].x,vertices[0].y,vertices[1].x-vertices[0].x,color,alpha
+    #@graphics.drawIntersectionCurve vertices[0].x,vertices[0].y,vertices[1].x-vertices[0].x,color,alpha
+    length = settings.stopLineGap
+    roadsBySector = []
+    for road in intersection.roads
+      do (road) ->
+        sector = road.source.rect.getSectorId road.target.rect.center()
+        roadsBySector[sector] = road
+    if roadsBySector[0] and roadsBySector[1]
+      @graphics.drawSingleIntersectionCurve vertices[1], roadsBySector[0].target.rect.getVertices()[2], roadsBySector[1].target.rect.getVertices()[0], length, color, alpha
+    if roadsBySector[1] and roadsBySector[2]
+      @graphics.drawSingleIntersectionCurve vertices[2], roadsBySector[1].target.rect.getVertices()[3], roadsBySector[2].target.rect.getVertices()[1], length, color, alpha
+    if roadsBySector[2] and roadsBySector[3]
+      @graphics.drawSingleIntersectionCurve vertices[3], roadsBySector[2].target.rect.getVertices()[0], roadsBySector[3].target.rect.getVertices()[2], length, color, alpha
+    if roadsBySector[3] and roadsBySector[0]
+      @graphics.drawSingleIntersectionCurve vertices[0], roadsBySector[3].target.rect.getVertices()[1], roadsBySector[0].target.rect.getVertices()[3], length, color, alpha
 
   drawSignals: (road) ->
     lightsColors = [settings.colors.redLight, settings.colors.greenLight]
@@ -95,11 +120,13 @@ class Visualizer
     @ctx.save()
     @ctx.lineWidth = 0.4
     leftLine = road.leftmostLane.leftBorder
-    @graphics.drawSegment leftLine
+    percent = settings.stopLineGap / leftLine.length
+    @graphics.drawSegment leftLine.subsegment percent, 1 - percent
     @graphics.stroke settings.colors.roadMarking
 
     rightLine = road.rightmostLane.rightBorder
-    @graphics.drawSegment rightLine
+    percent = settings.stopLineGap / rightLine.length
+    @graphics.drawSegment rightLine.subsegment percent, 1 - percent
     @graphics.stroke settings.colors.roadMarking
     @ctx.restore()
 
@@ -110,8 +137,9 @@ class Visualizer
     @ctx.save()
     for lane in road.lanes[1..]
       line = lane.rightBorder
+      percent = settings.stopLineGap / line.length
       dashSize = 1
-      @graphics.drawSegment line
+      @graphics.drawSegment line.subsegment percent, 1 - percent
       @ctx.lineWidth = 0.2
       @ctx.lineDashOffset = 1.5 * dashSize
       @ctx.setLineDash [dashSize]

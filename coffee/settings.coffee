@@ -17,7 +17,7 @@ settings =
   fps: 30
   lightsFlipInterval: 20
   gridSize: 14
+  stopLineGap: 5
   defaultTimeFactor: 5
-  signalTime:
 
 module.exports = settings
