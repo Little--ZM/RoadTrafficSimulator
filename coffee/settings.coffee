@@ -4,7 +4,9 @@ settings =
   colors:
     background: '#fdfdfd'
     redLight: 'hsl(0, 100%, 50%)'
+    redLightOff: 'hsl(0, 30%, 50%)'
     greenLight: '#85ee00'
+    greenLightOff: '#356e00'
     intersection: '#586970'
     road: '#586970'
     roadMarking: '#bbb'

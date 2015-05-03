@@ -22,6 +22,11 @@ class Graphics
     @lineTo point for point in vertices[1..]
     @ctx.closePath()
 
+  drawCircle: (center, radius) ->
+    @ctx.beginPath();
+    @ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI, false);
+    @ctx.closePath()
+    
   drawImage: (image, rect) ->
     @ctx.drawImage image, rect.left(), rect.top(), rect.width(), rect.height()
 

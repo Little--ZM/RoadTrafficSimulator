@@ -11,14 +11,20 @@ settings = require './settings'
 $ ->
   canvas = $('<canvas />', {id: 'canvas'})
   $('#simulation-canvas').append(canvas)
+  builderCanvas = $('<canvas />', {id: 'builder-canvas'})
+  $('#map-builder-canvas').append(builderCanvas)
 
   window.world = new World()
 #  world.generateMap()
 #  if world.intersections.length is 0
 #    world.generateMap()
 #    world.carsNumber = 0
-  window.visualizer = new Visualizer world
-#  visualizer.start()
+  window.visualizer = new Visualizer world, canvas
+
+  window.builderWorld = new World()
+  window.builderVisualizer = new Visualizer builderWorld, builderCanvas
+  window.builderVisualizer.start()
+
   window.settings = settings
 #   gui = new DAT.GUI()
 #   guiWorld = gui.addFolder 'world'
