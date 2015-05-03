@@ -88,27 +88,42 @@ class Visualizer
       @ctx.rotate (sideId + 1) * PI / 2
       @ctx.scale 1 * segment.length, 1 * segment.length
       # map lane ending to [(0, -0.5), (0, 0.5)]
+      # 左转灯
+      @graphics.drawCircle(new Point(0.2, -0.3), 0.1)
       if lights[0]
-        @graphics.drawTriangle(
-          new Point(0.1, -0.2),
-          new Point(0.2, -0.4),
-          new Point(0.3, -0.2)
-        )
         @graphics.fill settings.colors.greenLight
+      else
+        @graphics.fill settings.colors.greenLightOff
+#        @graphics.drawTriangle(
+#          new Point(0.1, -0.2),
+#          new Point(0.2, -0.4),
+#          new Point(0.3, -0.2)
+#        )
+#        @graphics.fill settings.colors.greenLight
+      # 直行灯
+      @graphics.drawCircle(new Point(0.2, 0), 0.1)
       if lights[1]
-        @graphics.drawTriangle(
-          new Point(0.3, -0.1),
-          new Point(0.5, 0),
-          new Point(0.3, 0.1)
-        )
         @graphics.fill settings.colors.greenLight
-      if lights[2]
-        @graphics.drawTriangle(
-          new Point(0.1, 0.2),
-          new Point(0.2, 0.4),
-          new Point(0.3, 0.2)
-        )
-        @graphics.fill settings.colors.greenLight
+      else
+        @graphics.fill settings.colors.greenLightOff
+#        @graphics.drawTriangle(
+#          new Point(0.3, -0.1),
+#          new Point(0.5, 0),
+#          new Point(0.3, 0.1)
+#        )
+#        @graphics.fill settings.colors.greenLight
+      # 红灯
+      @graphics.drawCircle(new Point(0.2, 0.3), 0.1)
+      if not lights[1]
+        @graphics.fill settings.colors.redLight
+      else
+        @graphics.fill settings.colors.redLightOff
+#        @graphics.drawTriangle(
+#          new Point(0.1, 0.2),
+#          new Point(0.2, 0.4),
+#          new Point(0.3, 0.2)
+#        )
+#        @graphics.fill settings.colors.greenLight
       @ctx.restore()
 
   drawRoad: (road, alpha) ->
