@@ -10,6 +10,7 @@
     <!--<link href="css/plugins/ionRangeSlider/ion.rangeSlider.skinFlat.css" rel="stylesheet">-->
 
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/simulator.css" /><!--自定义样式-->
     <link rel="icon" href="images/favicon.png" />
     <script src="dist/main.js"></script>
     <link rel="stylesheet" href="css/dat-gui.css" />
@@ -74,28 +75,39 @@
                 <div>
                     <div class="row">
                         <div class="col-lg-8">
-                        <div class="ibox float-e-margins">
-                            <div class="ibox-title">
-                                <h5>地图选择设置</h5>
-                                <span class="label label-primary pull-right">Map Related</span>
-                            </div>
-                            <div class="ibox-content">
-                                <p>
-                                    选择生成的地图样式 <code>地图样式</code>
-                                </p>
-                                <button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">
-                                    单交叉口 +
-                                </button>
-                                <!--<button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">-->
-                                    <!--井字形交叉口 #-->
-                                <!--</button>-->
-                                <!--<button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">-->
-                                    <!--干线四交叉口 -+-+-+-+--->
-                                <!--</button>-->
-
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <h5>地图选择设置</h5>
+                                    <span class="label label-primary pull-right">Map Related</span>
+                                    <!-- Nav tabs -->
+                                    <ul class="nav nav-tabs title-nav-tabs pull-right">
+                                        <li class="active"><a href="#preset-map" data-toggle="tab">预设地图</a></li>
+                                        <li><a href="#custom-map" data-toggle="tab">自定义地图</a></li>
+                                    </ul>
+                                </div>
+                                <div class="ibox-content">
+                                    <!-- Tab panes -->
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="preset-map">
+                                            <p>选择生成的地图样式 <code>地图样式</code></p>
+                                            <button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">
+                                                单交叉口 +
+                                            </button>
+                                            <!--<button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">-->
+                                                <!--井字形交叉口 #-->
+                                            <!--</button>-->
+                                            <!--<button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">-->
+                                                <!--干线四交叉口 -+-+-+-+--->
+                                            <!--</button>-->
+                                        </div>
+                                        <div class="tab-pane" id="custom-map">
+                                            <button type="button" class="btn btn-primary">编辑地图</button>
+                                            <button type="button" class="btn btn-primary">加载JSON</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
                         <div class="col-lg-4">
                             <div class="ibox float-e-margins">
@@ -369,7 +381,7 @@
     <link rel="stylesheet" href="css/animate.css" />
     <link rel="stylesheet" media="screen" href="css/plugins/handsonTable/handsontable.full.css">
 
-    <script src="js/inspinia.js"></script>
+<!--    <script src="js/inspinia.js"></script>-->
 
     <!-- Mainly scripts -->
     <script src="js/jquery-2.1.1.js"></script>

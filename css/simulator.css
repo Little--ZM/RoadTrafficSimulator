@@ -1,0 +1,9 @@
+.title-nav-tabs {
+    position: absolute;
+    right: 115px;
+    top: 19px;
+}
+.title-nav-tabs > li > a {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}

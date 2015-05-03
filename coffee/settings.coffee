@@ -18,6 +18,5 @@ settings =
   lightsFlipInterval: 20
   gridSize: 14
   defaultTimeFactor: 5
-  signalTime:
 
 module.exports = settings
