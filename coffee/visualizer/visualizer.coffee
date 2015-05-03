@@ -42,20 +42,26 @@ class Visualizer
     color = intersection.color or settings.colors.intersection
     @graphics.drawRect intersection.rect
     @ctx.lineWidth = 0.4
-    #@graphics.stroke color
+    @graphics.stroke color
     @graphics.fillRect intersection.rect, color, alpha
-    vertices = intersection.rect.getVertices()
-    for j, i in [1, 2, 3, 0]
-      @graphics.drawLine vertices[i], vertices[i].add (vertices[j].subtract vertices[i]).mult 0.5
-      @ctx.closePath()
+    for road in intersection.inRoads
+      leftLine = road.leftmostLane.leftBorder
+      rightLine = road.rightmostLane.rightBorder
+      percent = settings.stopLineGap / leftLine.length
+      @graphics.drawLine leftLine.getPoint(1 - percent), rightLine.getPoint(1 - percent)
       @graphics.stroke settings.colors.roadMarking
+#    vertices = intersection.rect.getVertices()
+#    for j, i in [1, 2, 3, 0]
+#      @graphics.drawLine vertices[i], vertices[i].add (vertices[j].subtract vertices[i]).mult 0.5
+#      @ctx.closePath()
+#      @graphics.stroke settings.colors.roadMarking
 
   drawIntersectionWithCurve: (intersection, alpha) ->
     color = intersection.color or settings.colors.road
     @ctx.lineWidth = 0.4
     vertices = intersection.rect.getVertices()
     #@graphics.drawIntersectionCurve vertices[0].x,vertices[0].y,vertices[1].x-vertices[0].x,color,alpha
-    length = (vertices[1].x-vertices[0].x) * 0.5
+    length = settings.stopLineGap
     roadsBySector = []
     for road in intersection.roads
       do (road) ->
@@ -114,11 +120,13 @@ class Visualizer
     @ctx.save()
     @ctx.lineWidth = 0.4
     leftLine = road.leftmostLane.leftBorder
-    @graphics.drawSegment leftLine
+    percent = settings.stopLineGap / leftLine.length
+    @graphics.drawSegment leftLine.subsegment percent, 1 - percent
     @graphics.stroke settings.colors.roadMarking
 
     rightLine = road.rightmostLane.rightBorder
-    @graphics.drawSegment rightLine
+    percent = settings.stopLineGap / rightLine.length
+    @graphics.drawSegment rightLine.subsegment percent, 1 - percent
     @graphics.stroke settings.colors.roadMarking
     @ctx.restore()
 
@@ -129,8 +137,9 @@ class Visualizer
     @ctx.save()
     for lane in road.lanes[1..]
       line = lane.rightBorder
+      percent = settings.stopLineGap / line.length
       dashSize = 1
-      @graphics.drawSegment line
+      @graphics.drawSegment line.subsegment percent, 1 - percent
       @ctx.lineWidth = 0.2
       @ctx.lineDashOffset = 1.5 * dashSize
       @ctx.setLineDash [dashSize]
