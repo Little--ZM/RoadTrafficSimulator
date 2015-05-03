@@ -42,8 +42,13 @@ class Visualizer
     color = intersection.color or settings.colors.intersection
     @graphics.drawRect intersection.rect
     @ctx.lineWidth = 0.4
-    @graphics.stroke settings.colors.roadMarking
+    #@graphics.stroke color
     @graphics.fillRect intersection.rect, color, alpha
+    vertices = intersection.rect.getVertices()
+    for j, i in [1, 2, 3, 0]
+      @graphics.drawLine vertices[i], vertices[i].add (vertices[j].subtract vertices[i]).mult 0.5
+      @ctx.closePath()
+      @graphics.stroke settings.colors.roadMarking
 
   drawIntersectionWithCurve: (intersection, alpha) ->
     color = intersection.color or settings.colors.road
