@@ -747,7 +747,7 @@ $(function() {
         });
     }
     function loadIntersections() {
-        selectIntersection.html();
+        selectIntersection.html('');
         _.each(window.jsonMap.intersections, function(intersection) {
             selectIntersection.append($('<option>', {value: intersection.id, text: intersection.id}));
         });
