@@ -71,12 +71,6 @@ class Rect
     vertices = @getVertices()
     new Segment vertices[i], vertices[(i + 1) % 4]
 
-
-#
-#    0---1
-#    |   |
-#    |   |
-#    2---3
 #   找出 source 和 target 的 SectorID 就可以确定车的走向
   getSectorId: (point) ->
     offset = point.subtract @center()

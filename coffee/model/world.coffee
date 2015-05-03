@@ -58,27 +58,27 @@ class World
 #    将当前数据用json格式存储起来
     localStorage.world = JSON.stringify data
 
-#    加载仿真场景
-  load: ->
-    data = localStorage.world
+  load: (data) ->
+    data = data or localStorage.world
     data = data and JSON.parse data
-
-#    知道data为空，则返回
     return unless data?
     @clear()
     @carsNumber = data.carsNumber or 0
-
-#    添加交叉口
     for id, intersection of data.intersections
       @addIntersection Intersection.copy intersection
-
-#      添加到道路
-#    TODO  这里的逻辑需要修改 不能随机的选择 交叉口作为起始点和终止点
     for id, road of data.roads
       road = Road.copy road
       road.source = @getIntersection road.source
       road.target = @getIntersection road.target
       @addRoad road
+
+#    区分真实交叉口以及 车辆产生rect
+    for id, intersection of @intersections.all()
+      if intersection.roads.length >= 2
+        @realIntersection.put intersection
+      else
+        intersection.generateCar = true
+        @carProducerIntersection.put intersection
 
 #      产生地图
   generateMap: (minX = -2, maxX = 2, minY = -2, maxY = 2) ->
@@ -306,6 +306,7 @@ class World
       catLength = 3 + 2 * random()
       car = new Car road.lanes[laneNumber] ,catLength/2 ,speed,catLength
       if car.trajectory.nextCarDistance.distance > catLength
+        car.beginTime = Date.now()/1000
         @addCar car
         road.lanes[laneNumber].carsInLane[car.id] = car
       else

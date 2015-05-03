@@ -10,6 +10,13 @@ class Car
     @id = _.uniqueId 'car'
     @color = (300 + 240 * random() | 0) % 360
     @_speed = speed
+#    上一个状态的车速，用与判断是否停车
+    @last_speed = speed
+#    停车次数
+    @stop_times = 0
+#    停车延误
+    @stop_delay = 0
+
     @width = 1.7
     @length = length
     @maxSpeed = _.random(16,23)
@@ -111,6 +118,13 @@ class Car
 
 #    移动
   move: (delta) ->
+#    如果上一个状态的速度不为0，而当前状态为速度为0，则说明停车
+    if @last_speed is not 0 and @_speed is 0
+      @stop_times += 1
+#    如果上一个时间点的车速为零，这一个时间点的车速也未零，表示
+    if @last_speed is 0 and @_speed is 0
+      @stop_delay += delta
+
     acceleration = @getAcceleration()
 #    速度加上 加速度*倍速
     @speed += acceleration * delta

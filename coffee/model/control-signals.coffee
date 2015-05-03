@@ -11,12 +11,23 @@ class ControlSignals
     @stateNum = 0
 #    添加周期时间
     @cycleNumber=0
+#    周期长度
+    @cycleTime=120
+#    黄灯时间
+    @yellowTime=3
+#    信号周期设置
+    @timeSettings = [
+      {"start":0, "end":36},
+      {"start":38, "end":48},
+      {"start":60, "end":100},
+      {"start":102, "end":120}
+    ]
 
   states: [
-    ['LR', 'R', 'LR', 'R'],
     ['FR', 'R', 'FR', 'R'],
-    ['R', 'LR', 'R', 'LR'],
-    ['R', 'FR', 'R', 'FR']
+    ['LR', 'R', 'LR', 'R'],
+    ['R', 'FR', 'R', 'FR'],
+    ['R', 'LR', 'R', 'LR']
   ]
 
 #  红灯为0 绿灯为1
@@ -52,9 +63,41 @@ class ControlSignals
 
 #    时间推进函数
   onTick: (delta) =>
-    @time += delta
-    if @time > @flipInterval
-      @flip()
-      @time -= @flipInterval
+    if @timeSettings.length is 0
+      @time += delta
+      if @time > @flipInterval
+        @flip()
+        @time -= @flipInterval
+    else
+      @time += delta
+      tempTime =  @time % @cycleTime
+
+      statusIndex = @stateNum % @states.length
+
+      if statusIndex is 3
+        if tempTime > 0 and tempTime < @timeSettings[0].end
+          @flip()
+      else
+        if tempTime > @timeSettings[statusIndex].end + @yellowTime
+          @flip()
+
+  @copy: (controlSignals, intersection) ->
+    if !controlSignals?
+      return new ControlSignals intersection
+    result = Object.create ControlSignals::
+    result.cycleTime = controlSignals.cycleTime
+    result.yellowTime = controlSignals.yellowTime
+    result.timeSettings = controlSignals.timeSettings
+    result.stateNum = 0
+    result.intersection = intersection
+    result
+
+  toJSON: ->
+    obj =
+      cycleTime: @cycleTime
+      yellowTime: @yellowTime
+      timeSettings: @timeSettings
+
+
 
 module.exports = ControlSignals
