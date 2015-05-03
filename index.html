@@ -101,8 +101,8 @@
                                             <!--</button>-->
                                         </div>
                                         <div class="tab-pane" id="custom-map">
-                                            <button type="button" class="btn btn-primary">编辑地图</button>
-                                            <button type="button" class="btn btn-primary">加载JSON</button>
+                                            <button type="button" id="edit-map" class="btn btn-primary">编辑地图</button>
+                                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#load-json-map-modal">加载JSON格式地图</button>
                                         </div>
                                     </div>
                                 </div>
@@ -376,6 +376,23 @@
         </div>
     </div>
 
+    <div class="modal fade" id="load-json-map-modal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">加载JSON格式地图</h4>
+          </div>
+          <div class="modal-body">
+            <textarea class="load-json-map-textarea"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary" id="load-json-map-btn">加载</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <link rel="stylesheet" href="css/custom.css" />
     <link rel="stylesheet" href="css/animate.css" />
@@ -710,6 +727,13 @@ $(function(){
 
 });
 
+$(function() {
+    $('#load-json-map-btn').click(function() {
+        window.jsonMap = $('#load-json-map-modal textarea').val();
+        console.log(window.jsonMap);
+        $('#load-json-map-modal').modal('hide');
+    });
+});
 
     </script>
 </body>
