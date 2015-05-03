@@ -5,6 +5,7 @@ require '../helpers'
 LanePosition = require './lane-position'
 Curve = require '../geom/curve'
 _ = require 'underscore'
+settings = require '../settings'
 
 # 车辆的轨迹轨迹类 用于判断车辆的各种判断
 # 传入的参数 车辆 车道 车辆所在位置
@@ -83,7 +84,7 @@ class Trajectory
     intersection.controlSignals.state[sideId][@turnNumber]
 
   getDistanceToIntersection: ->
-    distance = @current.lane.length - @car.length / 2 - @current.position
+    distance = @current.lane.length - @car.length / 2 - @current.position - settings.stopLineGap
     if not @isChangingLanes then max distance, 0 else Infinity
 
   timeToMakeTurn: (plannedStep = 0) ->
@@ -99,7 +100,7 @@ class Trajectory
       nextLane = @car.popNextLane()
 #      @_startChangingLanes nextLane, 0
       if @turnNumber isnt 1
-        @_startChangingLanes nextLane, 0
+        @_startChangingLanes nextLane, settings.stopLineGap
       else
         @_startChangingLanes nextLane.road.lanes[@current.lane.laneIndex], 0
     tempRelativePosition = @temp.position / @temp.lane?.length
