@@ -49,7 +49,21 @@ class Visualizer
     color = intersection.color or settings.colors.road
     @ctx.lineWidth = 0.4
     vertices = intersection.rect.getVertices()
-    @graphics.drawIntersectionCurve vertices[0].x,vertices[0].y,vertices[1].x-vertices[0].x,color,alpha
+    #@graphics.drawIntersectionCurve vertices[0].x,vertices[0].y,vertices[1].x-vertices[0].x,color,alpha
+    length = (vertices[1].x-vertices[0].x) * 0.5
+    roadsBySector = []
+    for road in intersection.roads
+      do (road) ->
+        sector = road.source.rect.getSectorId road.target.rect.center()
+        roadsBySector[sector] = road
+    if roadsBySector[0] and roadsBySector[1]
+      @graphics.drawSingleIntersectionCurve vertices[1], roadsBySector[0].target.rect.getVertices()[2], roadsBySector[1].target.rect.getVertices()[0], length, color, alpha
+    if roadsBySector[1] and roadsBySector[2]
+      @graphics.drawSingleIntersectionCurve vertices[2], roadsBySector[1].target.rect.getVertices()[3], roadsBySector[2].target.rect.getVertices()[1], length, color, alpha
+    if roadsBySector[2] and roadsBySector[3]
+      @graphics.drawSingleIntersectionCurve vertices[3], roadsBySector[2].target.rect.getVertices()[0], roadsBySector[3].target.rect.getVertices()[2], length, color, alpha
+    if roadsBySector[3] and roadsBySector[0]
+      @graphics.drawSingleIntersectionCurve vertices[0], roadsBySector[3].target.rect.getVertices()[1], roadsBySector[0].target.rect.getVertices()[3], length, color, alpha
 
   drawSignals: (road) ->
     lightsColors = [settings.colors.redLight, settings.colors.greenLight]
