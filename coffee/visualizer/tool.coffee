@@ -40,7 +40,7 @@ class Tool
   draw: ->
 
   getPoint: (e) ->
-    canvasBound = canvas.getBoundingClientRect()
+    canvasBound = @canvas.getBoundingClientRect()
     new Point e.pageX - canvasBound.left, e.pageY - canvasBound.top
 
   getCell: (e) ->
