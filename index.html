@@ -42,6 +42,11 @@
                         </a>
                     </li>
                     <li>
+                        <a href="#map-builder" data-toggle="tab">
+                            <i class="fa fa-flask"></i> <span class="nav-label">Map Builder</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="#simulation" data-toggle="tab">
                             <i class="fa fa-flask"></i> <span class="nav-label">Simulation</span>
                         </a>
@@ -287,6 +292,19 @@
 
 
             </div>
+          
+            <!-- Map Builder Page -->
+            <div role="tabpanel" class="tab-pane" id="map-builder">
+              <div class="row">
+                    <div id="map-builder-canvas"></div>
+                    <div class="map-builder-param ibox-content">
+                        <div class="m-b">
+                            <button id="" class="btn btn-sm btn-primary">清空</button>
+                            <button id="export-json" class="btn btn-sm btn-primary">导出JSON</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Simulation Page -->
             <div role="tabpanel" class="tab-pane" id="simulation">
@@ -317,14 +335,6 @@
                             <br>
                             <input type="text" id="timeFactor" value="5"
                                 data-min="0.1" data-max="10" data-step="0.1" data-width="85" data-height="85">
-                        </div>
-                        <div class="m-b">
-                            <label>Lights Flip Interval</label>
-                            <br>
-                            <input type="text" id="lightsFlipIntervalGreen" value="10" data-fgcolor="#1AB394"
-                                data-min="0" data-max="50" data-step="0.01" data-width="85" data-height="85">
-                            <input type="text" id="lightsFlipIntervalRed" value="10" data-fgcolor="#ED5565"
-                                data-min="0" data-max="50" data-step="0.01" data-width="85" data-height="85">
                         </div>
                     </div>
                 </div>

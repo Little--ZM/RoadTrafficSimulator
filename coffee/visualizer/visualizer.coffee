@@ -17,8 +17,7 @@ Zoomer = require './zoomer'
 settings = require '../settings'
 
 class Visualizer
-  constructor: (@world) ->
-    @$canvas = $('#canvas')
+  constructor: (@world, @$canvas) ->
     @canvas = @$canvas[0]
     @ctx = @canvas.getContext('2d')
 

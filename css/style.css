@@ -1,31 +1,14 @@
 /*@import url("http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;lang=en");*/
 
-body, html {
-  padding: 0;
-  margin: 0;
-  /*overflow: auto;*/
-  background: #97a1a1;
+body,
+html {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #97a1a1;
 }
 
-.simulation-graph {
-  height: 330px;
-  position: fixed;
-  bottom: 0;
-  left: 235px;
-  right: 0;
-  padding: 20px 20px 0 5px;
-}
-
-.simulation-param {
-  width: 250px;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 330px;
-  overflow-y: scroll;
-  background: white;
-  border-left: 1px solid #eee !important;
-}
 /* * { background-color: rgba(255, 0, 0, 0.1); } */
 /* * * { background-color: rgba(0, 255, 0, 0.2); } */
 /* * * * { background-color: rgba(0, 0, 255, 0.3); } */

@@ -1,9 +1,3 @@
-body,
-html {
-    height: 100%;
-    overflow: hidden;
-}
-
 #wrapper {
     height: 100%;
 }
@@ -24,4 +18,28 @@ html {
 #load-json-map-modal textarea {
     width: 100%;
     height: 250px;
+}
+
+.simulation-graph {
+  height: 330px;
+  position: fixed;
+  bottom: 0;
+  left: 235px;
+  right: 0;
+  padding: 20px 20px 0 5px;
+}
+
+.simulation-param,
+.map-builder-param {
+  width: 250px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 330px;
+  overflow-y: scroll;
+  background: white;
+  border-left: 1px solid #eee !important;
+}
+.map-builder-param {
+  bottom: 0;
 }
