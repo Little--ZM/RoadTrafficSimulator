@@ -193,6 +193,8 @@
                             <div class="ibox-content">
                                 <div class="row form-group">
                                     <div class="col-sm-3">
+                                        <label class="control-label">选择路口</label>
+                                        <select id="signal-control-intersection" class="form-control"></select>
                                         <label class="control-label">定时控制</label>
                                         <p><code>信号周期</code></p>
                                         <input id="signal-cycle" type="number" class="form-control" placeholder="信号周期 ...">
@@ -200,7 +202,6 @@
                                         <p><code>黄灯时间</code></p>
                                         <input id="yellow-time" type="number" class="form-control" placeholder="黄灯时间 ...">
                                         <br>
-                                        <button id="set-signal" class="btn btn-success " type="button" onclick="set_signal()"><i class="fa fa-upload"></i>&nbsp;&nbsp;<span class="bold">Submit</span></button>
                                     </div>
                                     <div class="col-sm-9">
                                         <div class="row">
@@ -401,6 +402,7 @@
 <!--    <script src="js/inspinia.js"></script>-->
 
     <!-- Mainly scripts -->
+    <script src="js/underscore-1.8.3.js"></script>
     <script src="js/jquery-2.1.1.js"></script>
     <script src="js/bootstrap.min.js"></script>
 
@@ -625,27 +627,6 @@ var circle_time = 150;
 var yellow_time = 2;
 var single_array = [];
 
-function set_signal() {
-
-    circle_time =  $("#signal-cycle").val();
-    yellow_time = $("#yellow-time").val();
-
-    $("#signal1").data("ionRangeSlider").update({
-        max: circle_time
-    });
-    $("#signal2").data("ionRangeSlider").update({
-        max: circle_time
-    });
-    $("#signal3").data("ionRangeSlider").update({
-        max: circle_time
-    });
-    $("#signal4").data("ionRangeSlider").update({
-        max: circle_time
-    });
-
-}
-
-
 $(function(){
 
 
@@ -728,12 +709,381 @@ $(function(){
 });
 
 $(function() {
+    window.jsonMap = {};
+    var selectIntersection = $('#signal-control-intersection');
+    function loadSelectedIntersection() {
+        var intersectionId = selectIntersection.find(':selected').val();
+        var controlSignals = window.jsonMap.intersections[intersectionId].controlSignals;
+
+        $('#signal-cycle').val(controlSignals.cycleTime);
+        $('#signal-cycle').off().change(function() {
+            controlSignals.cycleTime = $(this).val();
+            _.each([1, 2, 3, 4], function(d) {
+                var slider = $('#signal' + d).data("ionRangeSlider");
+                slider.update({max: controlSignals.cycleTime});
+            });
+            $('#signal4').data("ionRangeSlider").update({to: controlSignals.cycleTime});
+        });
+        $('#yellow-time').val(controlSignals.yellowTime);
+        $('#yellow-time').off().change(function() {
+            controlSignals.yellowTime = $(this).val();
+        });
+
+        _.each([1, 2, 3, 4], function(d, i) {
+            var slider = $('#signal' + d).data("ionRangeSlider");
+            slider.update({
+                from: controlSignals.timeSettings[i].start,
+                to: controlSignals.timeSettings[i].end,
+                max: controlSignals.cycleTime
+            });
+            slider.onFinish = function(data) {
+                var nextSlider = $('#signal' + (d + 1)).data('ionRangeSlider');
+                if (!!nextSlider) {
+                    slider.update({from: data.to + controlSignals.yellowTime});
+                }
+                controlSignals.timeSettings[i].start = data.from;
+                controlSignals.timeSettings[i].end = data.to;
+            }
+        });
+    }
+    function loadIntersections() {
+        selectIntersection.html();
+        _.each(window.jsonMap.intersections, function(intersection) {
+            selectIntersection.append($('<option>', {value: intersection.id, text: intersection.id}));
+        });
+        selectIntersection.first('option').prop("selected", true);
+        loadSelectedIntersection();
+    }
+    selectIntersection.change(loadSelectedIntersection);
     $('#load-json-map-btn').click(function() {
-        window.jsonMap = $('#load-json-map-modal textarea').val();
-        console.log(window.jsonMap);
+        window.jsonMap = JSON.parse($('#load-json-map-modal textarea').val());
+        loadIntersections();
         $('#load-json-map-modal').modal('hide');
     });
+    window.jsonMap = mockJsonMap(); // TEST
+    loadIntersections();
 });
+
+function mockJsonMap() {
+    return {
+    "carsNumber": 51,
+    "intersections": {
+        "intersection205": {
+            "controlSignals": {
+                "cycleTime": 150,
+                "yellowTime": 3,
+                "timeSettings": [
+                    {"start": 0, "end": 42},
+                    {"start": 45, "end": 60},
+                    {"start": 63, "end": 100},
+                    {"start": 103, "end": 150}
+                ]
+            },
+            "id": "intersection205",
+            "rect": {
+                "_height": 14,
+                "_width": 14,
+                "x": -140,
+                "y": -140
+            }
+        },
+        "intersection206": {
+            "controlSignals": {
+                "cycleTime": 140,
+                "yellowTime": 5,
+                "timeSettings": [
+                    {"start": 0, "end": 32},
+                    {"start": 35, "end": 50},
+                    {"start": 53, "end": 120},
+                    {"start": 123, "end": 140}
+                ]
+            },
+            "id": "intersection206",
+            "rect": {
+                "_height": 14,
+                "_width": 14,
+                "x": -140,
+                "y": 28
+            }
+        },
+        "intersection207": {
+            "controlSignals": {
+                "cycleTime": 150,
+                "yellowTime": 3,
+                "timeSettings": [
+                    {"start": 0, "end": 42},
+                    {"start": 45, "end": 60},
+                    {"start": 63, "end": 100},
+                    {"start": 103, "end": 150}
+                ]
+            },
+            "id": "intersection207",
+            "rect": {
+                "_height": 14,
+                "_width": 14,
+                "x": 98,
+                "y": 28
+            }
+        },
+        "intersection208": {
+            "controlSignals": {
+                "cycleTime": 150,
+                "yellowTime": 3,
+                "timeSettings": [
+                    {"start": 0, "end": 42},
+                    {"start": 45, "end": 60},
+                    {"start": 63, "end": 100},
+                    {"start": 103, "end": 150}
+                ]
+            },
+            "id": "intersection208",
+            "rect": {
+                "_height": 14,
+                "_width": 14,
+                "x": 98,
+                "y": -140
+            }
+        },
+        "intersection225": {
+            "controlSignals": {
+                "cycleTime": 150,
+                "yellowTime": 3,
+                "timeSettings": [
+                    {"start": 0, "end": 42},
+                    {"start": 45, "end": 60},
+                    {"start": 63, "end": 100},
+                    {"start": 103, "end": 150}
+                ]
+            },
+            "id": "intersection225",
+            "rect": {
+                "_height": 14,
+                "_width": 14,
+                "x": 280,
+                "y": -140
+            }
+        },
+        "intersection226": {
+            "controlSignals": {
+                "cycleTime": 150,
+                "yellowTime": 3,
+                "timeSettings": [
+                    {"start": 0, "end": 42},
+                    {"start": 45, "end": 60},
+                    {"start": 63, "end": 100},
+                    {"start": 103, "end": 150}
+                ]
+            },
+            "id": "intersection226",
+            "rect": {
+                "_height": 14,
+                "_width": 14,
+                "x": 280,
+                "y": 28
+            }
+        },
+        "intersection235": {
+            "controlSignals": {
+                "cycleTime": 150,
+                "yellowTime": 3,
+                "timeSettings": [
+                    {"start": 0, "end": 42},
+                    {"start": 45, "end": 60},
+                    {"start": 63, "end": 100},
+                    {"start": 103, "end": 150}
+                ]
+            },
+            "id": "intersection235",
+            "rect": {
+                "_height": 14,
+                "_width": 14,
+                "x": 280,
+                "y": -238
+            }
+        },
+        "intersection240": {
+            "controlSignals": {
+                "cycleTime": 150,
+                "yellowTime": 3,
+                "timeSettings": [
+                    {"start": 0, "end": 42},
+                    {"start": 45, "end": 60},
+                    {"start": 63, "end": 100},
+                    {"start": 103, "end": 150}
+                ]
+            },
+            "id": "intersection240",
+            "rect": {
+                "_height": 14,
+                "_width": 14,
+                "x": -140,
+                "y": 154
+            }
+        },
+        "intersection243": {
+            "controlSignals": {
+                "cycleTime": 150,
+                "yellowTime": 3,
+                "timeSettings": [
+                    {"start": 0, "end": 42},
+                    {"start": 45, "end": 60},
+                    {"start": 63, "end": 100},
+                    {"start": 103, "end": 150}
+                ]
+            },
+            "id": "intersection243",
+            "rect": {
+                "_height": 14,
+                "_width": 14,
+                "x": 98,
+                "y": 140
+            }
+        },
+        "intersection250": {
+            "controlSignals": {
+                "cycleTime": 150,
+                "yellowTime": 3,
+                "timeSettings": [
+                    {"start": 0, "end": 42},
+                    {"start": 45, "end": 60},
+                    {"start": 63, "end": 100},
+                    {"start": 103, "end": 150}
+                ]
+            },
+            "id": "intersection250",
+            "rect": {
+                "_height": 14,
+                "_width": 14,
+                "x": 266,
+                "y": 140
+            }
+        }
+    },
+    "roads": {
+        "road213": {
+            "id": "road213",
+            "source": "intersection205",
+            "target": "intersection208"
+        },
+        "road214": {
+            "id": "road214",
+            "source": "intersection208",
+            "target": "intersection205"
+        },
+        "road217": {
+            "id": "road217",
+            "source": "intersection207",
+            "target": "intersection208"
+        },
+        "road218": {
+            "id": "road218",
+            "source": "intersection208",
+            "target": "intersection207"
+        },
+        "road221": {
+            "id": "road221",
+            "source": "intersection206",
+            "target": "intersection207"
+        },
+        "road222": {
+            "id": "road222",
+            "source": "intersection207",
+            "target": "intersection206"
+        },
+        "road223": {
+            "id": "road223",
+            "source": "intersection206",
+            "target": "intersection205"
+        },
+        "road224": {
+            "id": "road224",
+            "source": "intersection205",
+            "target": "intersection206"
+        },
+        "road227": {
+            "id": "road227",
+            "source": "intersection207",
+            "target": "intersection226"
+        },
+        "road228": {
+            "id": "road228",
+            "source": "intersection226",
+            "target": "intersection207"
+        },
+        "road229": {
+            "id": "road229",
+            "source": "intersection226",
+            "target": "intersection225"
+        },
+        "road230": {
+            "id": "road230",
+            "source": "intersection225",
+            "target": "intersection226"
+        },
+        "road233": {
+            "id": "road233",
+            "source": "intersection225",
+            "target": "intersection208"
+        },
+        "road234": {
+            "id": "road234",
+            "source": "intersection208",
+            "target": "intersection225"
+        },
+        "road238": {
+            "id": "road238",
+            "source": "intersection225",
+            "target": "intersection235"
+        },
+        "road239": {
+            "id": "road239",
+            "source": "intersection235",
+            "target": "intersection225"
+        },
+        "road241": {
+            "id": "road241",
+            "source": "intersection240",
+            "target": "intersection206"
+        },
+        "road242": {
+            "id": "road242",
+            "source": "intersection206",
+            "target": "intersection240"
+        },
+        "road244": {
+            "id": "road244",
+            "source": "intersection240",
+            "target": "intersection243"
+        },
+        "road245": {
+            "id": "road245",
+            "source": "intersection243",
+            "target": "intersection240"
+        },
+        "road248": {
+            "id": "road248",
+            "source": "intersection243",
+            "target": "intersection207"
+        },
+        "road249": {
+            "id": "road249",
+            "source": "intersection207",
+            "target": "intersection243"
+        },
+        "road251": {
+            "id": "road251",
+            "source": "intersection243",
+            "target": "intersection250"
+        },
+        "road252": {
+            "id": "road252",
+            "source": "intersection250",
+            "target": "intersection243"
+        }
+    },
+    "time": 412.85618499998236
+};
+}
 
     </script>
 </body>
