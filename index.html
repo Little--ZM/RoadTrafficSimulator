@@ -5,8 +5,9 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
     <link href="css/plugins/switchery/switchery.css" rel="stylesheet">
+    <link href="css/plugins/ionRangeSlider/ion.rangeSlider.skinHTML5.css" rel="stylesheet">
     <link href="css/plugins/ionRangeSlider/ion.rangeSlider.css" rel="stylesheet">
-    <link href="css/plugins/ionRangeSlider/ion.rangeSlider.skinFlat.css" rel="stylesheet">
+    <!--<link href="css/plugins/ionRangeSlider/ion.rangeSlider.skinFlat.css" rel="stylesheet">-->
 
     <link rel="stylesheet" href="css/style.css" />
     <link rel="icon" href="images/favicon.png" />
@@ -69,6 +70,210 @@
                         <h2>Welcome to Tongji Traffic Simulator!</h2>
                     </div>
                 </div>
+                <br/>
+                <div>
+                    <div class="row">
+                        <div class="col-lg-8">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5>地图选择设置</h5>
+                                <span class="label label-primary pull-right">Map Related</span>
+                            </div>
+                            <div class="ibox-content">
+                                <p>
+                                    选择生成的地图样式 <code>地图样式</code>
+                                </p>
+                                <button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">
+                                    单交叉口 +
+                                </button>
+                                <!--<button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">-->
+                                    <!--井字形交叉口 #-->
+                                <!--</button>-->
+                                <!--<button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">-->
+                                    <!--干线四交叉口 -+-+-+-+--->
+                                <!--</button>-->
+
+                            </div>
+                        </div>
+                    </div>
+
+                        <div class="col-lg-4">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label label-success pull-right">model</span>
+                                    <h5>跟车模型</h5>
+                                </div>
+                                <div class="ibox-content">
+                                    <h1 class="no-margins">智能跟车模型</h1><br>
+                                    <div class="stat-percent font-bold text-success">wiki<i class="fa fa-bolt"></i></div>
+                                    <small>Total income</small>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5>仿真周期设置</h5>
+                                <span class="label text-success pull-right">Time Related</span>
+                            </div>
+                            <div class="ibox-content">
+                                <input id="sim-time" type="number" class="form-control" placeholder="仿真时间长度 ...">
+                                <div class="stat-percent font-bold text-success">min <i class="fa fa-clock-o"></i></div>
+                                <small>单位</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-info pull-right">max speed</span>
+                                <h5>最大车速</h5>
+                            </div>
+                            <div class="ibox-content">
+                                <input id="max-car-speed" type="number" class="form-control" placeholder="最大车速 ...">
+                                <div class="stat-percent font-bold text-info">km/h <i class="fa fa-level-up"></i></div>
+                                <small>单位</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-primary pull-right">maxAcceleration</span>
+                                <h5>最大加速度</h5>
+                            </div>
+                            <div class="ibox-content">
+                                <input id="max-car-Acceleration" type="number" class="form-control" placeholder="最大加速度 ...">
+                                <div class="stat-percent font-bold text-navy">m2/s <i class="fa fa-level-up"></i></div>
+                                <small>单位</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-danger pull-right">maxDeceleration</span>
+                                <h5>最大减速度</h5>
+                            </div>
+                            <div class="ibox-content">
+                                <input id="max-car-Deceleration" type="number" class="form-control" placeholder="最大加速度 ...">
+                                <div class="stat-percent font-bold text-danger">m2/s<i class="fa fa-level-down"></i></div>
+                                <small>单位</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-lg-12   ">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5>信号控制相关</h5>
+                                <span class="label label-success pull-right">Signal Related</span>
+                            </div>
+                            <div class="ibox-content">
+                                <div class="row form-group">
+                                    <div class="col-sm-3">
+                                        <label class="control-label">定时控制</label>
+                                        <p><code>信号周期</code></p>
+                                        <input id="signal-cycle" type="number" class="form-control" placeholder="信号周期 ...">
+                                        <br>
+                                        <p><code>黄灯时间</code></p>
+                                        <input id="yellow-time" type="number" class="form-control" placeholder="黄灯时间 ...">
+                                        <br>
+                                        <button id="set-signal" class="btn btn-success " type="button" onclick="set_signal()"><i class="fa fa-upload"></i>&nbsp;&nbsp;<span class="bold">Submit</span></button>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <div class="row">
+                                            <div class="col-sm-2"><span class="label pull-left label-primary">东西直行 <i class="fa fa-exchange"></i></span></div>
+                                            <div class="col-sm-10"><input type="text" id="signal1" name="example_name" value="" /></div>
+
+                                        </div><br>
+                                        <div class="row">
+                                            <div class="col-sm-2"><span class="label pull-left label-info">东西左转 <i class="fa fa-reply"></i></span></div>
+                                            <div class="col-sm-10"><input type="text" id="signal2" name="example_name" value="" /></div>
+
+                                        </div><br>
+                                        <div class="row">
+                                            <div class="col-sm-2"><span class="label pull-left label-warning">南北直行 <i class="fa fa-exchange"></i></span></div>
+                                            <div class="col-sm-10"><input type="text" id="signal3" name="example_name" value="" /></div>
+
+                                        </div><br>
+                                        <div class="row">
+                                            <div class="col-sm-2"><span class="label pull-left label-danger">南北左转 <i class="fa fa-reply"></i></span></div>
+                                            <div class="col-sm-10"><input type="text" id="signal4" name="example_name" value="" /></div>
+
+                                        </div><br>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-9">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5>车流量设置</h5>
+                                <span class="label label-warning pull-right">car producer Related</span>
+                            </div>
+                            <div class="ibox-content">
+                                <div class="row form-group">
+
+                                    <div class="col-sm-4">
+                                        <label class="control-label"><p><code>左转车流量</code></p></label>
+                                        <input id="left-car" type="number" class="form-control" placeholder="左转车流 ...">
+                                        <div class="stat-percent font-bold text-navy">vel/h <i class="fa fa-car"></i></div>
+                                        <small>单位</small>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <label class="control-label"><p><code>直行车流量</code></p></label>
+                                        <input id="straight-car" type="number" class="form-control" placeholder="自行车流 ...">
+                                        <div class="stat-percent font-bold text-navy">vel/h <i class="fa fa-car"></i></div>
+                                        <small>单位</small>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <label class="control-label"><p><code>左转车流量</code></p></label>
+                                        <input id="right-car" type="number" class="form-control" placeholder="左转车流 ...">
+                                        <div class="stat-percent font-bold text-navy">vel/h <i class="fa fa-car"></i></div>
+                                        <small>单位</small>
+                                    </div>
+
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+
+                        <div class="ibox-title">
+                            <h5>仿真操作</h5>
+                            <span class="label label-danger pull-right">start simulator</span>
+                        </div>
+                        <div class="ibox-content">
+                            <button id="start-sim" class="btn btn-success " type="button" onclick="set_signal()"><i class="fa fa-arrow-right"></i>&nbsp;&nbsp;<span class="bold">开始仿真</span></button>
+                        </div>
+
+
+                    </div>
+                </div>
+
+
             </div>
 
             <!-- Simulation Page -->
@@ -159,6 +364,13 @@
         </div>
     </div>
 
+
+    <link rel="stylesheet" href="css/custom.css" />
+    <link rel="stylesheet" href="css/animate.css" />
+    <link rel="stylesheet" media="screen" href="css/plugins/handsonTable/handsontable.full.css">
+
+    <script src="js/inspinia.js"></script>
+
     <!-- Mainly scripts -->
     <script src="js/jquery-2.1.1.js"></script>
     <script src="js/bootstrap.min.js"></script>
@@ -174,12 +386,30 @@
     <script src="js/plugins/switchery/switchery.js"></script>
     <script src="js/plugins/ionRangeSlider/ion.rangeSlider.min.js"></script>
     <script src="js/plugins/jsKnob/jquery.knob.js"></script>
+    <script src="js/plugins/iCheck/icheck.min.js"></script>
+    <script src="js/plugins/pace/pace.min.js"></script>
+    <script src="js/plugins/metisMenu/jquery.metisMenu.js"></script>
+    <script src="js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+    <script src="js/plugins/handsonTable/handsontable.full.js"></script>
 
     <script type="text/javascript">
-$(function() {
+
     var world = window.world;
     var visualizer = window.visualizer;
     var settings = window.settings;
+
+
+    var signalSettings = {};
+
+    var mapJson = {};
+
+    // 解析json的map
+    function UploadAndParseJsonMap(){}
+
+
+$(function() {
+
 
     var elem = document.querySelector('.js-running');
     var isRunning = new Switchery(elem, { color: '#1AB394' });
@@ -188,10 +418,14 @@ $(function() {
     });
 
     $('#generate-single').click(function () {
+        visualizer.previousTime = 0;
         world.generateSingleCrossRoadMap();
+        visualizer.start()
     });
     $('#generate-complex').click(function () {
+        visualizer.previousTime = 0;
         world.generateCrossRoadMap();
+        visualizer.start()
     });
 
     $('#cars_number').ionRangeSlider({
@@ -356,6 +590,114 @@ $(function() {
     $.plot($("#flot-bar-chart"), [barData], barOptions);
 
 });
+
+var single_time;
+var circle_time = 150;
+var yellow_time = 2;
+var single_array = [];
+
+function set_signal() {
+
+    circle_time =  $("#signal-cycle").val();
+    yellow_time = $("#yellow-time").val();
+
+    $("#signal1").data("ionRangeSlider").update({
+        max: circle_time
+    });
+    $("#signal2").data("ionRangeSlider").update({
+        max: circle_time
+    });
+    $("#signal3").data("ionRangeSlider").update({
+        max: circle_time
+    });
+    $("#signal4").data("ionRangeSlider").update({
+        max: circle_time
+    });
+
+}
+
+
+$(function(){
+
+
+    $("#signal1").ionRangeSlider({
+        grid: true,
+        type: "double",
+        min: 0,
+        max: circle_time,
+        from: 0,
+        postfix: " s",
+        decorate_both: false,
+        values_separator: " to ",
+
+        onFinish:  function (data) {
+
+            var slider = $("#signal2").data("ionRangeSlider");
+            // Call sliders update method with any params
+            slider.update({
+                from: data.to + parseInt(yellow_time)
+            });
+
+
+        }
+    });
+    $("#signal2").ionRangeSlider({
+        grid: true,
+        type: "double",
+        min: 0,
+        max: circle_time,
+        from: 0,
+        postfix: " s",
+        decorate_both: false,
+        values_separator: " to ",
+
+        onFinish:  function (data) {
+
+            var slider = $("#signal3").data("ionRangeSlider");
+            // Call sliders update method with any params
+            slider.update({
+                from: data.to + parseInt(yellow_time)
+            });
+
+        }
+
+    });
+    $("#signal3").ionRangeSlider({
+        grid: true,
+        type: "double",
+        min: 0,
+        max: circle_time,
+        from: 0,
+        postfix: " s",
+        decorate_both: false,
+        values_separator: " to ",
+
+        onFinish:  function (data) {
+
+            var slider = $("#signal4").data("ionRangeSlider");
+            // Call sliders update method with any params
+            slider.update({
+                from: data.to + parseInt(yellow_time)
+            });
+
+        }
+    });
+
+    $("#signal4").ionRangeSlider({
+        grid: true,
+        type: "double",
+        min: 0,
+        max: circle_time,
+        from: 0,
+        to: circle_time,
+        postfix: " s",
+        decorate_both: false,
+        values_separator: " to "
+    });
+
+
+});
+
 
     </script>
 </body>

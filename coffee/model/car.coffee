@@ -12,11 +12,12 @@ class Car
     @_speed = speed
     @width = 1.7
     @length = length
-    @maxSpeed = _.random(30,50)
+    @maxSpeed = _.random(16,23)
     @s0 = 2
     @timeHeadway = 1.5
-    @maxAcceleration = 1
-    @maxDeceleration = 3
+#    将车辆的最大加速度减速度随机真实化
+    @maxAcceleration = _.random(1.5,2)
+    @maxDeceleration = _.random(2.5,3)
     @trajectory = new Trajectory this, lane, position
     @alive = true
     @preferedLane = null
@@ -70,6 +71,8 @@ class Car
   release: ->
     @trajectory.release()
 
+    #TODO 1 对于即将进入交叉口的车辆来说，必须要减速。 可能要重新写一个方法
+    #TODO 2 对于转换道路的车辆，加速度上要进行限制
 #    获得加速度
   getAcceleration: ->
     nextCarDistance = null
@@ -79,7 +82,17 @@ class Car
 #        nextCarDistance = Distance
 #      else nextCarDistance = @trajectory.nextCarDistance
 #    else
-    nextCarDistance = @trajectory.nextCarDistance
+    if @trajectory.isChangingLanes and @nextLane and not @trajectory.current.free
+      nextCarDistanceInNextLane = @trajectory.getNextCarDistanceinNextLane @nextLane
+      nextCarDistanceInCurrentLane = @trajectory.nextCarDistance
+      if @speed is 0 and nextCarDistanceInCurrentLane.distance < nextCarDistanceInNextLane.distance
+        nextCarDistance = nextCarDistanceInNextLane
+      else
+        nextCarDistance =  nextCarDistanceInCurrentLane
+    else
+      nextCarDistance = @trajectory.nextCarDistance
+
+#    nextCarDistance = @trajectory.nextCarDistance
     distanceToNextCar = max nextCarDistance.distance, 0
     a = @maxAcceleration
     b = @maxDeceleration
@@ -112,11 +125,11 @@ class Car
         else @pickStraightLane currentLane
       if @ChangeLanePosition is null
 #        @ChangeLanePosition = @trajectory.current.lane.length * 0.1
-        @ChangeLanePosition = _.random(@trajectory.current.lane.length * 0.1, currentLane.length - 5 * @length)
+        @ChangeLanePosition = _.random(@trajectory.current.lane.length * 0.1, currentLane.length * 0.3)
       if preferedLane isnt currentLane and @trajectory.absolutePosition > this.ChangeLanePosition
         if @trajectory.checkRearviewMirror preferedLane
           @trajectory.changeLane preferedLane
-        else if @trajectory.absolutePosition > currentLane.length - 4 * @length
+        else if @trajectory.absolutePosition > currentLane.length - 6 * @length
           @trajectory.changeLane preferedLane
 
     step = @speed * delta + 0.5 * acceleration * delta ** 2

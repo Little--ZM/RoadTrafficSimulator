@@ -15,20 +15,21 @@ class Intersection
     @carStayInLaneMapByCycle = {}
 #    指的是通过交叉口的车辆的数目 最后根据仿真跑的时间，可以统计出交叉口的流量
     @carThroughIntersectionMapByCycle = {}
-#    指的是最大通行能力，指的在使用
+#    指的是最大通行能力，指的在一定时间段内通过的最大车流量
+#    这个map 记录这每一个周期内的车流量
+    @CPAThroughIntersectionMapByCycle = {}
     @maxCPA = 0
     @CycleNum = 0
     @avragelineCars = 0
     @generateCar = false
+    @CPAThroughIntersectionMapByCycle[0] = 0
 
 #  用于计算当前当前周期交叉口排队长度 最大排队长度是每条车道上的车辆数
   caculatorCarInLane: (CycleNum) ->
     if @CycleNum+1 is CycleNum
       @carStayInLaneMapByCycle[@CycleNum] = @avragelineCars / (@roads[0].lanesNumber * 4)
-      console.log  @carStayInLaneMapByCycle[@CycleNum]
-      console.log  @CycleNum
-      console.log  @avragelineCars
       @avragelineCars = 0
+      @CPAThroughIntersectionMapByCycle[CycleNum] = 0
       @CycleNum = CycleNum
     for road in @inRoads
       if @controlSignals.state[road.targetSideId][0] is 1

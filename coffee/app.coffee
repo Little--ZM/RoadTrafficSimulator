@@ -13,12 +13,12 @@ $ ->
   $('#simulation-canvas').append(canvas)
 
   window.world = new World()
-  world.generateMap()
-  if world.intersections.length is 0
-    world.generateMap()
-    world.carsNumber = 0
+#  world.generateMap()
+#  if world.intersections.length is 0
+#    world.generateMap()
+#    world.carsNumber = 0
   window.visualizer = new Visualizer world
-  visualizer.start()
+#  visualizer.start()
   window.settings = settings
 #   gui = new DAT.GUI()
 #   guiWorld = gui.addFolder 'world'

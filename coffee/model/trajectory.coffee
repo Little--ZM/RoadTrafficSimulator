@@ -95,6 +95,7 @@ class Trajectory
     @next.position += distance
     @temp.position += distance
     if @timeToMakeTurn() and @canEnterIntersection() and @isValidTurn()
+      @current.lane.road.target.CPAThroughIntersectionMapByCycle[@current.lane.road.target.CycleNum] +=1
       nextLane = @car.popNextLane()
 #      @_startChangingLanes nextLane, 0
       if @turnNumber isnt 1
@@ -102,7 +103,7 @@ class Trajectory
       else
         @_startChangingLanes nextLane.road.lanes[@current.lane.laneIndex], 0
     tempRelativePosition = @temp.position / @temp.lane?.length
-    gap = 2 * @car.length
+    gap = 1.5 * @car.length
     if @isChangingLanes and @temp.position > gap and not @current.free
       @current.release()
     if @isChangingLanes and @next.free and
@@ -126,9 +127,10 @@ class Trajectory
 
   checkRearviewMirror: (nextLane) ->
     for id, o of nextLane.carsPositions
-      if @current.position > o.position
-        if 0 < @current.position - o.position  < @car.length
-          return false
+      if 0 < @current.position - o.position  < @car.length
+        return false
+      if 0 < o.position - @current.position < @car.length
+        return false
     return true
 
   canInitiativeChangeLane: (nextLane) ->

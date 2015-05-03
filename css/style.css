@@ -1,9 +1,9 @@
-@import url("http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;lang=en");
+/*@import url("http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;lang=en");*/
 
 body, html {
   padding: 0;
   margin: 0;
-  overflow: hidden;
+  /*overflow: auto;*/
   background: #97a1a1;
 }
 
