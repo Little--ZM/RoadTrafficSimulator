@@ -20,8 +20,11 @@ $ ->
 #    world.generateMap()
 #    world.carsNumber = 0
   window.visualizer = new Visualizer world, canvas
-  window.builderVisualizer = new Visualizer world, builderCanvas
-#  visualizer.start()
+
+  window.builderWorld = new World()
+  window.builderVisualizer = new Visualizer builderWorld, builderCanvas
+  window.builderVisualizer.start()
+
   window.settings = settings
 #   gui = new DAT.GUI()
 #   guiWorld = gui.addFolder 'world'
