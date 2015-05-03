@@ -1,3 +1,17 @@
+body,
+html {
+    height: 100%;
+    overflow: hidden;
+}
+
+#wrapper {
+    height: 100%;
+}
+#page-wrapper {
+    height: 100%;
+    overflow: scroll;
+}
+
 .title-nav-tabs {
     position: absolute;
     right: 115px;
