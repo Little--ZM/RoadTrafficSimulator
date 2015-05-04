@@ -24,10 +24,10 @@ class ControlSignals
     ]
 
   states: [
-    ['FR', 'R', 'FR', 'R'],
-    ['LR', 'R', 'LR', 'R'],
     ['R', 'FR', 'R', 'FR'],
-    ['R', 'LR', 'R', 'LR']
+    ['R', 'LR', 'R', 'LR'],
+    ['FR', 'R', 'FR', 'R'],
+    ['LR', 'R', 'LR', 'R']
   ]
 
 #  红灯为0 绿灯为1

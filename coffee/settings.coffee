@@ -2,13 +2,13 @@
 
 settings =
   colors:
-    background: '#fdfdfd'
-    redLight: 'hsl(0, 100%, 50%)'
+    background: '#C4DBEB'
+    redLight: '#FF3300'
     redLightOff: 'hsl(0, 30%, 50%)'
     greenLight: '#85ee00'
     greenLightOff: '#356e00'
-    intersection: '#586970'
-    road: '#586970'
+    intersection: '#303030'
+    road: '#303030'
     roadMarking: '#bbb'
     hoveredIntersection: '#3d4c53'
     tempRoad: '#aaa'
@@ -18,8 +18,8 @@ settings =
     hoveredGrid: '#f4e8e1'
   fps: 30
   lightsFlipInterval: 20
-  gridSize: 14
-  stopLineGap: 5
+  gridSize: 20
+  stopLineGap: 7
   defaultTimeFactor: 5
 
 module.exports = settings
