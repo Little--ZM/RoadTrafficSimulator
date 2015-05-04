@@ -106,24 +106,12 @@ class Visualizer
         @graphics.fill settings.colors.greenLight
       else
         @graphics.fill settings.colors.greenLightOff
-#        @graphics.drawTriangle(
-#          new Point(0.3, -0.1),
-#          new Point(0.5, 0),
-#          new Point(0.3, 0.1)
-#        )
-#        @graphics.fill settings.colors.greenLight
       # 红灯
       @graphics.drawCircle(new Point(0.2, 0.3), 0.1)
       if not lights[1]
         @graphics.fill settings.colors.redLight
       else
         @graphics.fill settings.colors.redLightOff
-#        @graphics.drawTriangle(
-#          new Point(0.1, 0.2),
-#          new Point(0.2, 0.4),
-#          new Point(0.3, 0.2)
-#        )
-#        @graphics.fill settings.colors.greenLight
       @ctx.restore()
 
   drawRoad: (road, alpha) ->
