@@ -35,6 +35,7 @@ class Visualizer
     @_running = false
     @previousTime = 0
     @timeFactor = settings.defaultTimeFactor
+    @isBuildMap = false
     @debug = false
 
   drawIntersection: (intersection, alpha) ->
@@ -197,7 +198,8 @@ class Visualizer
     if delta > 30
       delta = 100 if delta > 100
       @previousTime = time
-      @world.onTick @timeFactor * delta / 1000, @timeFactor
+      if not @isBuildMap
+        @world.onTick @timeFactor * delta / 1000, @timeFactor
       @updateCanvasSize()
       @graphics.clear settings.colors.background
       @graphics.save()
@@ -223,8 +225,9 @@ class Visualizer
     set: (running) ->
       if running then @start() else @stop()
 
-  start: ->
+  start: (isBuild)->
 #    if !@_running
+    @isBuildMap = isBuild
     unless @_running
       @_running = true
       @draw()

@@ -36,14 +36,18 @@ class Intersection
         for lane in road.lanes
           @avragelineCars += lane.carsPositions.size
 
-
-#   平均排队车辆数是指一个信号周期内各车道最大排队车辆数的平均值
   @copy: (intersection) ->
     intersection.rect = Rect.copy intersection.rect
     result = Object.create Intersection::
     _.extend result, intersection
     result.roads = []
     result.inRoads = []
+    result.carStayInLaneMapByCycle = {}
+    result.CPAThroughIntersectionMapByCycle = {}
+    result.carStayInLaneMapByCycle = {}
+    result.maxCPA = 0
+    result.CycleNum = 0
+    result.generateCar = false
     result.controlSignals = ControlSignals.copy result.controlSignals, result
     result
 

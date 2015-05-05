@@ -89,6 +89,7 @@ class ControlSignals
     result.yellowTime = controlSignals.yellowTime
     result.timeSettings = controlSignals.timeSettings
     result.stateNum = 0
+    result.time = 0
     result.intersection = intersection
     result
 

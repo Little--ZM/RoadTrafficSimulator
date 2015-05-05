@@ -23,8 +23,8 @@ class Graphics
     @ctx.closePath()
 
   drawCircle: (center, radius) ->
-    @ctx.beginPath();
-    @ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI, false);
+    @ctx.beginPath()
+    @ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI, false)
     @ctx.closePath()
     
   drawImage: (image, rect) ->

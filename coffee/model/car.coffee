@@ -10,12 +10,15 @@ class Car
     @id = _.uniqueId 'car'
     @color = (300 + 240 * random() | 0) % 360
     @_speed = speed
+
 #    上一个状态的车速，用与判断是否停车
     @last_speed = speed
 #    停车次数
     @stop_times = 0
 #    停车延误
     @stop_delay = 0
+#    是否停过车
+    @hasBeenStoped = false
 
     @width = 1.7
     @length = length
@@ -31,9 +34,7 @@ class Car
     @ChangeLanePosition = null
 
 #    行车起始时间
-    @beginTime = Date.now()/1000
-#    行车结束时间
-    @stopTime = 0
+    @timeSpend = 0
 #    车辆的行程
     @distance = 0.0
 
@@ -65,15 +66,6 @@ class Car
 #      return true
 #    return false
 
-#  获取时间延误
-  getTimeDelay: ->
-    if not @alive
-      minTime = @distance/@maxSpeed
-      realTime = @stopTime - @beginTime
-      return realTime -minTime
-    else
-      console.log "not stop yet"
-
 
   release: ->
     @trajectory.release()
@@ -92,7 +84,7 @@ class Car
     if @trajectory.isChangingLanes and @nextLane and not @trajectory.current.free
       nextCarDistanceInNextLane = @trajectory.getNextCarDistanceinNextLane @nextLane
       nextCarDistanceInCurrentLane = @trajectory.nextCarDistance
-      if @speed is 0 and nextCarDistanceInCurrentLane.distance < nextCarDistanceInNextLane.distance
+      if @speed < 0.001 and nextCarDistanceInCurrentLane.distance < nextCarDistanceInNextLane.distance
         nextCarDistance = nextCarDistanceInNextLane
       else
         nextCarDistance =  nextCarDistanceInCurrentLane
@@ -118,16 +110,21 @@ class Car
 
 #    移动
   move: (delta) ->
-#    如果上一个状态的速度不为0，而当前状态为速度为0，则说明停车
-    if @last_speed is not 0 and @_speed is 0
-      @stop_times += 1
-#    如果上一个时间点的车速为零，这一个时间点的车速也未零，表示
-    if @last_speed is 0 and @_speed is 0
-      @stop_delay += delta
 
     acceleration = @getAcceleration()
 #    速度加上 加速度*倍速
     @speed += acceleration * delta
+
+    testspeed =  @speed
+    if @speed < 0.0001
+      testspeed = parseInt @speed
+    if @last_speed > 0 and testspeed is 0
+      @last_speed = testspeed
+      @stop_times += 1
+    #    如果上一个时间点的车速为零，这一个时间点的车速也未零，表示
+    if @last_speed is 0 and testspeed is 0
+      @stop_delay += delta
+
 
     if not @trajectory.isChangingLanes and @nextLane
       currentLane = @trajectory.current.lane
@@ -146,6 +143,7 @@ class Car
         else if @trajectory.absolutePosition > currentLane.length - 6 * @length
           @trajectory.changeLane preferedLane
 
+#    加速度路程公式
     step = @speed * delta + 0.5 * acceleration * delta ** 2
 
 ##     如果发现下一辆车的距离与小于将要前进的步伐
@@ -157,9 +155,10 @@ class Car
 #     如果没有下一条路了，则选择没有
     if @trajectory.timeToMakeTurn(step)
       if not @nextLane?
-        @stopTime = Date.now()/1000
+        if @stop_times > 0
+          @hasBeenStoped  = true
         return @alive = false
-
+    @timeSpend += delta
     @distance += step
     @trajectory.moveForward step
 

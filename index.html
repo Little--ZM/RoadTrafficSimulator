@@ -84,31 +84,15 @@
                                     <h5>地图选择设置</h5>
                                     <span class="label label-primary pull-right">Map Related</span>
                                     <!-- Nav tabs -->
-                                    <ul class="nav nav-tabs title-nav-tabs pull-right">
-                                        <li class="active"><a href="#preset-map" data-toggle="tab">预设地图</a></li>
-                                        <li><a href="#custom-map" data-toggle="tab">自定义地图</a></li>
-                                    </ul>
                                 </div>
                                 <div class="ibox-content">
                                     <!-- Tab panes -->
-                                    <div class="tab-content">
-                                        <div class="tab-pane active" id="preset-map">
-                                            <p>选择生成的地图样式 <code>地图样式</code></p>
-                                            <button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">
-                                                单交叉口 +
-                                            </button>
-                                            <!--<button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">-->
-                                                <!--井字形交叉口 #-->
-                                            <!--</button>-->
-                                            <!--<button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">-->
-                                                <!--干线四交叉口 -+-+-+-+--->
-                                            <!--</button>-->
-                                        </div>
+
                                         <div class="tab-pane" id="custom-map">
+                                            <p>请先去<code>Map buider</code> 创建并导出<code>Json</code>地图,再来加载地图</p>
                                             <button type="button" id="edit-map" class="btn btn-primary">编辑地图</button>
                                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#load-json-map-modal">加载JSON格式地图</button>
                                         </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -283,7 +267,7 @@
                             <span class="label label-danger pull-right">start simulator</span>
                         </div>
                         <div class="ibox-content">
-                            <button id="start-sim" class="btn btn-success " type="button" onclick="set_signal()"><i class="fa fa-arrow-right"></i>&nbsp;&nbsp;<span class="bold">开始仿真</span></button>
+                            <button id="start-sim" class="btn btn-success " type="button"><i class="fa fa-arrow-right"></i>&nbsp;&nbsp;<span class="bold">开始仿真</span></button>
                         </div>
 
 
@@ -299,8 +283,8 @@
                     <div id="map-builder-canvas"></div>
                     <div class="map-builder-param ibox-content">
                         <div class="m-b">
-                            <button id="" class="btn btn-sm btn-primary">清空</button>
-                            <button id="export-json" class="btn btn-sm btn-primary">导出JSON</button>
+                            <button id="clear_build_world" class="btn btn-sm btn-primary">清空</button>
+                            <button id="export_build_json" class="btn btn-sm btn-primary">导出JSON</button>
                         </div>
                     </div>
                 </div>
@@ -314,13 +298,18 @@
                         <div class="m-b" style="line-height: 32px">
                             <label for="running">Running</label>
                             <span class="pull-right">
-                                <input type="checkbox" name="running" class="js-running" checked />
+                                <input type="checkbox" name="running" class="js-running" />
                             </span>
                         </div>
                         <div class="m-b">
                             <label>Generate</label>
                             <button id="generate-single" class="btn btn-sm btn-primary">Single</button>
                             <button id="generate-complex" class="btn btn-sm btn-primary">Complex</button>
+                        </div>
+                        <div class="m-b">
+                            <label>Option</label>
+                            <button id="export_world" class="btn btn-sm btn-primary">SaveMap</button>
+                            <button id="restart_world" class="btn btn-sm btn-primary">LoadMap</button>
                         </div>
                         <div class="m-b">
                             <label>Cars Number</label>
@@ -339,7 +328,7 @@
                     </div>
                 </div>
                 <div class="row gray-bg simulation-graph">
-                    <div class="col-sm-5">
+                    <div class="col-sm-4">
                         <div class="ibox float-e-margins">
                             <div class="ibox-title">
                                 <h5>平均车速</h5>
@@ -347,21 +336,35 @@
                             </div>
                             <div class="ibox-content">
                                 <div class="flot-chart">
-                                    <div class="flot-chart-content" id="flot-line-chart-moving"></div>
+                                    <div class="flot-chart-content" id="instantSpeed-chart-moving"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-5">
+                    <div class="col-sm-4">
                         <div class="ibox float-e-margins">
                             <div class="ibox-title">
-                                <h5>Static Chart</h5>
+                                <h5>平均延误</h5>
+                                <span class="label label-success pull-right">Average Delay</span>
                             </div>
                             <div class="ibox-content">
                                 <div class="flot-chart">
-                                    <div class="flot-chart-content" id="flot-bar-chart"></div>
+                                    <div class="flot-chart-content" id="instantDelay-chart-moving"></div>
                                 </div>
-                           </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5>平均停车延时</h5>
+                                <span class="label label-info pull-right">Average Stop Delay</span>
+                            </div>
+                            <div class="ibox-content">
+                                <div class="flot-chart">
+                                    <div class="flot-chart-content" id="instantStopTimes-chart-moving"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -448,9 +451,20 @@
     // 解析json的map
     function UploadAndParseJsonMap(){}
 
+$(function(){
+
+    $('#clear_build_world').click(function () {
+        window.builderWorld.clear();
+    });
+
+    $('#export_build_json').click(function () {
+        window.builderWorld.save();
+        console.log(localStorage.world);
+    });
+
+});
 
 $(function() {
-
 
     var elem = document.querySelector('.js-running');
     var isRunning = new Switchery(elem, { color: '#1AB394' });
@@ -458,15 +472,23 @@ $(function() {
         visualizer.running = this.checked;
     });
 
+    $('#export_world').click(function () {
+        world.save();
+        world.clear();
+    });
+    $('#restart_world').click(function () {
+        world.load();
+    });
+
     $('#generate-single').click(function () {
         visualizer.previousTime = 0;
         world.generateSingleCrossRoadMap();
-        visualizer.start()
+        visualizer.start(false)
     });
     $('#generate-complex').click(function () {
         visualizer.previousTime = 0;
         world.generateCrossRoadMap();
-        visualizer.start()
+        visualizer.start(false)
     });
 
     $('#cars_number').ionRangeSlider({
@@ -486,47 +508,57 @@ $(function() {
         'release' : function (v) { settings.lightsFlipInterval = v; }
     });
 
-    var container = $("#flot-line-chart-moving");
+    var instantSpeedContainer = $("#instantSpeed-chart-moving");
+    var instantDelayContainer = $("#instantDelay-chart-moving");
+    var instantStopTimesContainer = $("#instantStopTimes-chart-moving");
+    var maximum = instantSpeedContainer.outerWidth() / 2 || 300;
 
-    // Determine how many data points to keep based on the placeholder's initial size;
-    // this gives us a nice high-res plot while avoiding more than one point per pixel.
+    var data = [
+            [],
+            [],
+            []
+    ];
 
-    var maximum = container.outerWidth() / 2 || 300;
+    function getRandomData(y_side, i) {
 
-    //
-
-    var data = [];
-
-    function getRandomData() {
-
-        if (data.length) {
-            data = data.slice(1);
+        if (data[i].length) {
+            data[i] = data[i].slice(1);
         }
 
-        while (data.length < maximum) {
-            var y = world.instantSpeed;
-            data.push(y < 0 ? 0 : y > 100 ? 100 : y);
+        while (data[i].length < maximum) {
+            data[i].push(y_side);
         }
 
         // zip the generated y values with the x values
 
         var res = [];
-        for (var i = 0; i < data.length; ++i) {
-            res.push([i, data[i]])
+        for (var j = 0; j < data[i].length; ++j) {
+            res.push([j, data[i][j]])
         }
 
         return res;
     }
 
-    series = [{
-        data: getRandomData(),
+    instantSpeedContainerSeries = [{
+        data: [],
+        lines: {
+            fill: true
+        }
+    }];
+    instantDelayContainerSeries = [{
+        data:  [],
+        lines: {
+            fill: true
+        }
+    }];
+    instantStopTimesContainerSeries = [{
+        data:  [],
         lines: {
             fill: true
         }
     }];
 
-
-    var plot = $.plot(container, series, {
+    var instantSpeedContainerplot = $.plot(instantSpeedContainer, instantSpeedContainerSeries, {
         grid: {
 
             color: "#999999",
@@ -565,165 +597,243 @@ $(function() {
         },
         yaxis: {
             min: 0,
-            max: 10
+            max: 50
         },
         legend: {
             show: true
         }
     });
+    var instantDelayContainerplot = $.plot(instantDelayContainer, instantDelayContainerSeries, {
+        grid: {
 
+            color: "#999999",
+            tickColor: "#D4D4D4",
+            borderWidth:0,
+            minBorderMargin: 20,
+            labelMargin: 10,
+            backgroundColor: {
+                colors: ["#ffffff", "#ffffff"]
+            },
+            margin: {
+                top: 8,
+                bottom: 20,
+                left: 20
+            },
+            markings: function(axes) {
+                var markings = [];
+                var xaxis = axes.xaxis;
+                for (var x = Math.floor(xaxis.min); x < xaxis.max; x += xaxis.tickSize * 2) {
+                    markings.push({
+                        xaxis: {
+                            from: x,
+                            to: x + xaxis.tickSize
+                        },
+                        color: "#fff"
+                    });
+                }
+                return markings;
+            }
+        },
+        colors: ["#1ab394"],
+        xaxis: {
+            tickFormatter: function() {
+                return "";
+            }
+        },
+        yaxis: {
+            min: 0,
+            max: 50
+        },
+        legend: {
+            show: true
+        }
+    });
+    var instantStopTimesContainerplot = $.plot(instantStopTimesContainer, instantStopTimesContainerSeries, {
+        grid: {
+
+            color: "#999999",
+            tickColor: "#D4D4D4",
+            borderWidth:0,
+            minBorderMargin: 20,
+            labelMargin: 10,
+            backgroundColor: {
+                colors: ["#ffffff", "#ffffff"]
+            },
+            margin: {
+                top: 8,
+                bottom: 20,
+                left: 20
+            },
+            markings: function(axes) {
+                var markings = [];
+                var xaxis = axes.xaxis;
+                for (var x = Math.floor(xaxis.min); x < xaxis.max; x += xaxis.tickSize * 2) {
+                    markings.push({
+                        xaxis: {
+                            from: x,
+                            to: x + xaxis.tickSize
+                        },
+                        color: "#fff"
+                    });
+                }
+                return markings;
+            }
+        },
+        colors: ["#1ab394"],
+        xaxis: {
+            tickFormatter: function() {
+                return "";
+            }
+        },
+        yaxis: {
+            min: 0,
+            max: 50
+        },
+        legend: {
+            show: true
+        }
+    });
     // Update the random dataset at 25FPS for a smoothly-animating chart
-
     setInterval(function updateRandom() {
-        series[0].data = getRandomData();
-        plot.setData(series);
-        plot.draw();
+        instantSpeedContainerSeries[0].data = getRandomData(world.instantSpeed, 0);
+        instantSpeedContainerplot.setData(instantSpeedContainerSeries);
+        instantSpeedContainerplot.draw();
+
+        instantDelayContainerSeries[0].data = getRandomData(world.instantDelay, 1);
+        instantDelayContainerplot.setData(instantDelayContainerSeries);
+        instantDelayContainerplot.draw();
+
+        instantStopTimesContainerSeries[0].data = getRandomData(world.instantStopDelay, 2);
+        instantStopTimesContainerplot.setData(instantStopTimesContainerSeries);
+        instantStopTimesContainerplot.draw();
     }, 1000);
 
 });
 
 $(function() {
-    var barOptions = {
-        series: {
-            bars: {
-                show: true,
-                barWidth: 0.6,
-                fill: true,
-                fillColor: {
-                    colors: [{
-                        opacity: 0.8
-                    }, {
-                        opacity: 0.8
-                    }]
-                }
-            }
-        },
-        xaxis: {
-            tickDecimals: 0
-        },
-        colors: ["#1ab394"],
-        grid: {
-            color: "#999999",
-            hoverable: true,
-            clickable: true,
-            tickColor: "#D4D4D4",
-            borderWidth:0
-        },
-        legend: {
-            show: false
-        },
-        tooltip: true,
-        tooltipOpts: {
-            content: "x: %x, y: %y"
-        }
-    };
-    var barData = {
-        label: "bar",
-        data: [
-            [1, 34],
-            [2, 25],
-            [3, 19],
-            [4, 34],
-            [5, 32],
-            [6, 44]
-        ]
-    };
-    $.plot($("#flot-bar-chart"), [barData], barOptions);
 
-});
-
-var single_time;
-var circle_time = 150;
-var yellow_time = 2;
-var single_array = [];
-
-$(function(){
+    var single_time;
+    var circle_time = 150;
+    var yellow_time = 2;
+    var single_array = [];
 
 
-    $("#signal1").ionRangeSlider({
-        grid: true,
-        type: "double",
-        min: 0,
-        max: circle_time,
-        from: 0,
-        postfix: " s",
-        decorate_both: false,
-        values_separator: " to ",
 
-        onFinish:  function (data) {
-
-            var slider = $("#signal2").data("ionRangeSlider");
-            // Call sliders update method with any params
-            slider.update({
-                from: data.to + parseInt(yellow_time)
-            });
-
-
-        }
-    });
-    $("#signal2").ionRangeSlider({
-        grid: true,
-        type: "double",
-        min: 0,
-        max: circle_time,
-        from: 0,
-        postfix: " s",
-        decorate_both: false,
-        values_separator: " to ",
-
-        onFinish:  function (data) {
-
-            var slider = $("#signal3").data("ionRangeSlider");
-            // Call sliders update method with any params
-            slider.update({
-                from: data.to + parseInt(yellow_time)
-            });
-
-        }
-
-    });
-    $("#signal3").ionRangeSlider({
-        grid: true,
-        type: "double",
-        min: 0,
-        max: circle_time,
-        from: 0,
-        postfix: " s",
-        decorate_both: false,
-        values_separator: " to ",
-
-        onFinish:  function (data) {
-
-            var slider = $("#signal4").data("ionRangeSlider");
-            // Call sliders update method with any params
-            slider.update({
-                from: data.to + parseInt(yellow_time)
-            });
-
-        }
-    });
-
-    $("#signal4").ionRangeSlider({
-        grid: true,
-        type: "double",
-        min: 0,
-        max: circle_time,
-        from: 0,
-        to: circle_time,
-        postfix: " s",
-        decorate_both: false,
-        values_separator: " to "
-    });
-
-
-});
-
-$(function() {
     window.jsonMap = {};
     var selectIntersection = $('#signal-control-intersection');
+    var intersectionId;
+    var controlSignals;
     function loadSelectedIntersection() {
-        var intersectionId = selectIntersection.find(':selected').val();
-        var controlSignals = window.jsonMap.intersections[intersectionId].controlSignals;
+       intersectionId = selectIntersection.find(':selected').val();
+       controlSignals = window.jsonMap.intersections[intersectionId].controlSignals;
+
+        $("#signal1").ionRangeSlider({
+            grid: true,
+            type: "double",
+            min: 0,
+            max: circle_time,
+            from: 0,
+            postfix: " s",
+            decorate_both: false,
+            values_separator: " to ",
+
+            onFinish:  function (data) {
+
+                var slider = $("#signal2").data("ionRangeSlider");
+                // Call sliders update method with any params
+                slider.update({
+                    from: data.to + parseInt(controlSignals.yellowTime)
+                });
+
+                controlSignals.timeSettings[0].start = data.from;
+                controlSignals.timeSettings[0].end = data.to;
+
+            },
+            onUpdate: function (data) {
+                controlSignals.timeSettings[0].start = data.from;
+                controlSignals.timeSettings[0].end = data.to;
+            }
+        });
+        $("#signal2").ionRangeSlider({
+            grid: true,
+            type: "double",
+            min: 0,
+            max: circle_time,
+            from: 0,
+            postfix: " s",
+            decorate_both: false,
+            values_separator: " to ",
+
+            onFinish:  function (data) {
+
+                var slider = $("#signal3").data("ionRangeSlider");
+                // Call sliders update method with any params
+                slider.update({
+                    from: data.to + parseInt(controlSignals.yellowTime)
+                });
+
+                controlSignals.timeSettings[1].start = data.from;
+                controlSignals.timeSettings[1].end = data.to;
+
+            },
+
+            onUpdate: function (data) {
+                controlSignals.timeSettings[1].start = data.from;
+                controlSignals.timeSettings[1].end = data.to;
+            }
+
+        });
+        $("#signal3").ionRangeSlider({
+            grid: true,
+            type: "double",
+            min: 0,
+            max: circle_time,
+            from: 0,
+            postfix: " s",
+            decorate_both: false,
+            values_separator: " to ",
+
+            onFinish:  function (data) {
+
+                var slider = $("#signal4").data("ionRangeSlider");
+                // Call sliders update method with any params
+                slider.update({
+                    from: data.to + parseInt(controlSignals.yellowTime)
+                });
+
+                controlSignals.timeSettings[2].start = data.from;
+                controlSignals.timeSettings[2].end = data.to;
+
+            },
+            onUpdate: function (data) {
+                controlSignals.timeSettings[2].start = data.from;
+                controlSignals.timeSettings[2].end = data.to;
+            }
+        });
+
+        $("#signal4").ionRangeSlider({
+            grid: true,
+            type: "double",
+            min: 0,
+            max: circle_time,
+            from: 0,
+            to: circle_time,
+            postfix: " s",
+            decorate_both: false,
+            values_separator: " to ",
+
+            onFinish:  function (data) {
+
+                controlSignals.timeSettings[3].start = data.from;
+                controlSignals.timeSettings[3].end = data.to;
+
+            },
+            onUpdate: function (data) {
+                controlSignals.timeSettings[3].start = data.from;
+                controlSignals.timeSettings[3].end = data.to;
+            }
+
+        });
 
         $('#signal-cycle').val(controlSignals.cycleTime);
         $('#signal-cycle').off().change(function() {
@@ -737,28 +847,28 @@ $(function() {
         $('#yellow-time').val(controlSignals.yellowTime);
         $('#yellow-time').off().change(function() {
             controlSignals.yellowTime = $(this).val();
+            yellow_time = parseInt(controlSignals.yellowTime)
+            _.each([1, 2, 3], function(d) {
+                var slider = $('#signal' + d).data("ionRangeSlider");
+                var new_from = slider.old_to + parseInt(controlSignals.yellowTime);
+                var nextNum = d + 1;
+                $('#signal'+ nextNum).data("ionRangeSlider").update({from: new_from });
+            });
+
         });
 
         _.each([1, 2, 3, 4], function(d, i) {
-            var slider = $('#signal' + d).data("ionRangeSlider");
-            slider.update({
+            var slider = $('#signal' + d);
+            slider.data("ionRangeSlider").update({
                 from: controlSignals.timeSettings[i].start,
                 to: controlSignals.timeSettings[i].end,
                 max: controlSignals.cycleTime
             });
-            slider.onFinish = function(data) {
-                var nextSlider = $('#signal' + (d + 1)).data('ionRangeSlider');
-                if (!!nextSlider) {
-                    slider.update({from: data.to + controlSignals.yellowTime});
-                }
-                controlSignals.timeSettings[i].start = data.from;
-                controlSignals.timeSettings[i].end = data.to;
-            }
         });
     }
     function loadIntersections() {
         selectIntersection.html('');
-        _.each(window.jsonMap.intersections, function(intersection) {
+        _.each(window.jsonMap.realIntersection, function(intersection) {
             selectIntersection.append($('<option>', {value: intersection.id, text: intersection.id}));
         });
         selectIntersection.first('option').prop("selected", true);
@@ -769,6 +879,12 @@ $(function() {
         window.jsonMap = JSON.parse($('#load-json-map-modal textarea').val());
         loadIntersections();
         $('#load-json-map-modal').modal('hide');
+    });
+
+    $('#start-sim').click(function() {
+       visualizer.previousTime = 0;
+       world.load(JSON.stringify(window.jsonMap));
+       visualizer.start(false);
     });
 });
     </script>

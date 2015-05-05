@@ -15,20 +15,39 @@ class World
   constructor: ->
     @set {}
 
-#   瞬时平均速度
+#  瞬时平均速度
   @property 'instantSpeed',
     get: ->
-      speeds = _.map @cars.all(), (car) -> car.speed
-      return 0 if speeds.length is 0
-      return (_.reduce speeds, (a, b) -> a + b) / speeds.length
+      return 0 if @totalCarsNum is 0
+      avgspeed = (@totalAverageSpeed / @totalCarsNum  * 3.6)
+      return avgspeed
 
+#  平均延误
   @property 'instantDelay',
     get: ->
-      return 0 if @totalDelayCarsNum is 0
-      return @totalDelay/@totalDelayCarsNum
+      return 0 if @totalCarsNum is 0
+      return @totalDelay/@totalCarsNum
+
+#  平均停车次数
+  @property 'instantStopTimes',
+    get: ->
+      return 0 if @totalStopCarsNum is 0
+      return @totalStopTimes/@totalStopCarsNum
+
+#  平均停车延误
+  @property 'instantStopDelay',
+    get: ->
+      return 0 if @totalStopCarsNum is 0
+      return @totalStopDelay/@totalStopCarsNum
+
+#  实时停车比例
+  @property "instantStopRate",
+    get: ->
+      return 0 if @totalStopCarsNum is 0
+      return @totalStopCarsNum/@totalCarsNum
 
 
-#    环境设定
+  #    环境设定
   set: (obj) ->
 #    定义一个map
     obj ?= {}
@@ -39,7 +58,7 @@ class World
 #    定义一个车辆的pool
     @cars = new Pool Car, obj.cars
 #    将车辆的数量设为0
-    @carsNumber = 0
+    @carsNumber = 10
 #    车辆生成交叉口
     @carProducerIntersection = new Pool Intersection, obj.intersections
 
@@ -47,10 +66,22 @@ class World
 
     @timeFactor = 1
 
+#    一下几个统计项目，只统计消失的车辆
+#    所有完成车路程的车辆的平均速度和
+    @totalAverageSpeed = 0
+#    总延误
     @totalDelay = 0
-    @totalDelayCarsNum = 0
+#    总共停车次数
+    @totalStopTimes = 0.0
+#    总共停车的延误
+    @totalStopDelay = 0
+#    所有有过停车的行为的车辆
+    @totalStopCarsNum = 0
+#   所有已经完成路程的车辆的数目
+    @totalCarsNum = 0
 
   save: ->
+    @generateRealIntersecionAndCarProducer()
 #    将this中的对象全部都放入 {} 中
     data = _.extend {}, this
 #    删除data中的 cars
@@ -71,8 +102,12 @@ class World
       road.source = @getIntersection road.source
       road.target = @getIntersection road.target
       @addRoad road
-
+    @generateRealIntersecionAndCarProducer()
 #    区分真实交叉口以及 车辆产生rect
+
+  generateRealIntersecionAndCarProducer: ->
+    @realIntersection.clear()
+    @carProducerIntersection.clear()
     for id, intersection of @intersections.all()
       if intersection.roads.length >= 2
         @realIntersection.put intersection
@@ -80,60 +115,10 @@ class World
         intersection.generateCar = true
         @carProducerIntersection.put intersection
 
-#      产生地图
-  generateMap: (minX = -2, maxX = 2, minY = -2, maxY = 2) ->
-    @clear()
-    intersectionsNumber = (0.8 * (maxX - minX + 1) * (maxY - minY + 1)) | 0
-    map = {}
-    gridSize = settings.gridSize
-    step = 5 * gridSize
-    @carsNumber = 100
-
-#   创建 intersectionsNumber 个交叉口
-    while intersectionsNumber > 0
-      x = _.random minX, maxX
-      y = _.random minY, maxY
-
-#      unless 直到 的意思
-#      map中的 坐标xy为的内容为空 则可以继续进行
-      unless map[[x, y]]?
-
-        rect = new Rect step * x, step * y, gridSize, gridSize
-        intersection = new Intersection rect
-        @addIntersection map[[x, y]] = intersection
-        intersectionsNumber -= 1
-
-    for x in [minX..maxX]
-      previous = null
-      is_road = 0
-      for y in [minY..maxY]
-        intersection = map[[x, y]]
-        if intersection?
-          if abs(is_road - x - y) < 2
-#            如果previous 存在 就添加道路
-            @addRoad new Road intersection, previous if previous?
-            @addRoad new Road previous, intersection if previous?
-          previous = intersection
-          is_road = x + y
-
-
-    for y in [minY..maxY]
-      previous = null
-      is_road = 0
-      for x in [minX..maxX]
-        intersection = map[[x, y]]
-        if intersection?
-          if abs(is_road - x - y) < 2
-            @addRoad new Road intersection, previous if previous?
-            @addRoad new Road previous, intersection if previous?
-          previous = intersection
-          is_road = x + y
-    null
 
 #  按照一定逻辑 入口产生车辆
   generateCars:->
     null
-
 
 # 创建四个交叉口的车辆模型地图
   generateCrossRoadMap: ->
@@ -194,15 +179,7 @@ class World
     @addRoad new Road map[[1,1]], map[[1,2]]
     @addRoad new Road map[[1,2]], map[[1,1]]
 
-
-    for id, intersection of @intersections.all()
-      if intersection.roads.length >= 2
-        @realIntersection.put intersection
-      else
-        intersection.generateCar = true
-        @carProducerIntersection.put intersection
-
-
+    @generateRealIntersecionAndCarProducer()
 
 #  创建单个交叉口的地图模型
   generateSingleCrossRoadMap: ->
@@ -235,15 +212,7 @@ class World
     @addRoad new Road map[[0,0]], map[[0,1]]
     @addRoad new Road map[[0,1]], map[[0,0]]
 
-    for id, intersection of @intersections.all()
-#      console.log intersection.roads.length
-      if intersection.roads.length >= 2
-        @realIntersection.put intersection
-      else
-        intersection.generateCar = true
-        @carProducerIntersection.put intersection
-
-
+    @generateRealIntersecionAndCarProducer()
 
   clear: ->
     @set {}
@@ -257,9 +226,15 @@ class World
       car.move delta
       if !car.alive
 #        添加延误时间。
-        realTimeSpeed = car.stopTime - car.beginTime
-        @totalDelay += realTimeSpeed - car.distance / (car.maxSpeed * timeFactor)
-        @totalDelayCarsNum += 1
+        if car.distance > 0
+          @totalDelay += car.timeSpend - car.distance / car.maxSpeed
+  #        添加停车相关。
+          if car.hasBeenStoped
+            @totalStopTimes += car.stop_times
+            @totalStopDelay += car.stop_delay
+            @totalStopCarsNum += 1
+          @totalAverageSpeed += car.distance / car.timeSpend
+          @totalCarsNum += 1
         @removeCar car
 
   refreshCars: ->
@@ -306,7 +281,6 @@ class World
       catLength = 3 + 2 * random()
       car = new Car road.lanes[laneNumber] ,catLength/2 ,speed,catLength
       if car.trajectory.nextCarDistance.distance > catLength
-        car.beginTime = Date.now()/1000
         @addCar car
         road.lanes[laneNumber].carsInLane[car.id] = car
       else
