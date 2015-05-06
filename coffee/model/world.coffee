@@ -32,7 +32,7 @@ class World
   @property 'instantStopTimes',
     get: ->
       return 0 if @totalStopCarsNum is 0
-      return @totalStopTimes/@totalStopCarsNum
+      return @totalStopTimes/@totalCarsNum
 
 #  平均停车延误
   @property 'instantStopDelay',
@@ -79,6 +79,8 @@ class World
     @totalStopCarsNum = 0
 #   所有已经完成路程的车辆的数目
     @totalCarsNum = 0
+#   仿真的时间
+    @sim_time = 0
 
   save: ->
     @generateRealIntersecionAndCarProducer()
@@ -219,6 +221,7 @@ class World
 
   onTick: (delta, timeFactor) =>
     throw Error 'delta > 1' if delta > 1
+    @sim_time += delta
     @refreshCars()
     for id, intersection of @intersections.all()
       intersection.controlSignals.onTick delta

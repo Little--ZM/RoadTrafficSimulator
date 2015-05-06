@@ -14,17 +14,22 @@ $ ->
   builderCanvas = $('<canvas />', {id: 'builder-canvas'})
   $('#map-builder-canvas').append(builderCanvas)
 
+  signalHelpCanvas = $('<canvas />', {id: 'signalHelpCanvas'})
+  $('#signal-help-canvas').append(builderCanvas)
+  $('#signal-help-canvas').hide()
+
   window.world = new World()
-#  world.generateMap()
-#  if world.intersections.length is 0
-#    world.generateMap()
-#    world.carsNumber = 0
   window.visualizer = new Visualizer world, canvas
 #  window.builderVisualizer.start(false)
 
   window.builderWorld = new World()
   window.builderVisualizer = new Visualizer builderWorld, builderCanvas
   window.builderVisualizer.start(true)
+
+  window.signalHelpWorld = new World()
+  window.signalHelpVisualizer = new Visualizer signalHelpWorld, signalHelpCanvas
+  window.signalHelpVisualizer.start(true)
+
 
   window.settings = settings
 #   gui = new DAT.GUI()

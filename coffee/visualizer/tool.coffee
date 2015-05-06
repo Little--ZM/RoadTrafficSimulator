@@ -51,4 +51,9 @@ class Tool
     for id, intersection of intersections
       return intersection if intersection.rect.containsRect cell
 
+  getHoveredRealIntersection: (cell) ->
+    intersections = @visualizer.world.realIntersection.all()
+    for id, intersection of intersections
+      return intersection if intersection.rect.containsRect cell
+
 module.exports = Tool

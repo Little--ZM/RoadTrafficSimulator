@@ -42,12 +42,12 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#map-builder" data-toggle="tab">
+                        <a href="#map-builder" data-toggle="tab" id="world_builder">
                             <i class="fa fa-flask"></i> <span class="nav-label">Map Builder</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#simulation" data-toggle="tab">
+                        <a href="#simulation" data-toggle="tab" id="sim_tab">
                             <i class="fa fa-flask"></i> <span class="nav-label">Simulation</span>
                         </a>
                     </li>
@@ -123,8 +123,8 @@
                                 <span class="label text-success pull-right">Time Related</span>
                             </div>
                             <div class="ibox-content">
-                                <input id="sim-time" type="number" class="form-control" placeholder="仿真时间长度 ...">
-                                <div class="stat-percent font-bold text-success">min <i class="fa fa-clock-o"></i></div>
+                                <input id="sim-time" type="number" class="form-control" placeholder="(默认 3600 s)【推荐】">
+                                <div class="stat-percent font-bold text-success">sec <i class="fa fa-clock-o"></i></div>
                                 <small>单位</small>
                             </div>
                         </div>
@@ -136,7 +136,7 @@
                                 <h5>最大车速</h5>
                             </div>
                             <div class="ibox-content">
-                                <input id="max-car-speed" type="number" class="form-control" placeholder="最大车速 ...">
+                                <input id="max-car-speed" type="number" class="form-control" placeholder="(默认 60 - 90 随机)【推荐】">
                                 <div class="stat-percent font-bold text-info">km/h <i class="fa fa-level-up"></i></div>
                                 <small>单位</small>
                             </div>
@@ -149,7 +149,7 @@
                                 <h5>最大加速度</h5>
                             </div>
                             <div class="ibox-content">
-                                <input id="max-car-Acceleration" type="number" class="form-control" placeholder="最大加速度 ...">
+                                <input id="max-car-Acceleration" type="number" class="form-control" placeholder="(默认 2.5 - 3 随机)【推荐】">
                                 <div class="stat-percent font-bold text-navy">m2/s <i class="fa fa-level-up"></i></div>
                                 <small>单位</small>
                             </div>
@@ -162,11 +162,17 @@
                                 <h5>最大减速度</h5>
                             </div>
                             <div class="ibox-content">
-                                <input id="max-car-Deceleration" type="number" class="form-control" placeholder="最大加速度 ...">
+                                <input id="max-car-Deceleration" type="number" class="form-control" placeholder="(默认 1.5 - 2 随机)【推荐】">
                                 <div class="stat-percent font-bold text-danger">m2/s<i class="fa fa-level-down"></i></div>
                                 <small>单位</small>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="row" >
+                    <div id = "signal-help-canvas">
+
                     </div>
                 </div>
 
@@ -296,35 +302,67 @@
                     <div id="simulation-canvas"></div>
                     <div class="simulation-param ibox-content">
                         <div class="m-b" style="line-height: 32px">
-                            <label for="running">Running</label>
+                            <label  class="label label-success" for="running">Running</label>
+
                             <span class="pull-right">
-                                <input type="checkbox" name="running" class="js-running" />
+                                <input id="js-running" type="checkbox" name="running" class="js-running" checked />
                             </span>
                         </div>
-                        <div class="m-b">
-                            <label>Generate</label>
-                            <button id="generate-single" class="btn btn-sm btn-primary">Single</button>
-                            <button id="generate-complex" class="btn btn-sm btn-primary">Complex</button>
-                        </div>
-                        <div class="m-b">
-                            <label>Option</label>
-                            <button id="export_world" class="btn btn-sm btn-primary">SaveMap</button>
-                            <button id="restart_world" class="btn btn-sm btn-primary">LoadMap</button>
-                        </div>
-                        <div class="m-b">
-                            <label>Cars Number</label>
-                            <input type="text" id="cars_number" data-min="0" data-max="200" data-from="10">
-                        </div>
-                        <div class="m-b">
-                            <label>Scale</label>
-                            <input type="text" id="scale" data-min="0.1" data-max="2" data-from="1" data-step="0.01">
-                        </div>
-                        <div class="m-b">
-                            <label>Time Factor</label>
+                        <div id="sim_demo_param">
+                            <div class="m-b">
+                                <label>Generate</label>
+                                <button id="generate-single" class="btn btn-sm btn-primary">Single</button>
+                                <button id="generate-complex" class="btn btn-sm btn-primary">Complex</button>
+                            </div>
+                            <div class="m-b">
+                                <label>Option</label>
+                                <button id="export_world" class="btn btn-sm btn-primary">Save</button>
+                                <button id="restart_world" class="btn btn-sm btn-primary">Load</button>
+                            </div>
+                            <div class="m-b">
+                                <label>Cars Number</label>
+                                <input type="text" id="cars_number" data-min="0" data-max="200" data-from="10">
+                            </div>
+                            <div class="m-b">
+                                <label>Scale</label>
+                                <input type="text" id="scale" data-min="0.1" data-max="2" data-from="1" data-step="0.01">
+                            </div>
+                            <div class="m-b">
+                                <label>Time Factor</label>
+                                <br>
+                                <input type="text" id="timeFactor" value="5"
+                                    data-min="0.1" data-max="10" data-step="0.1" data-width="85" data-height="85">
+                            </div>
+                         </div>
+                        <div id="sim_real" class="m-b" style="display: none">
+                            <div>
+                                <span class="label label-success">仿 真 进 度</span>
+                            </div>
+                            <br/>
+                            <div id="simProgress-container"></div>
                             <br>
-                            <input type="text" id="timeFactor" value="5"
-                                data-min="0.1" data-max="10" data-step="0.1" data-width="85" data-height="85">
+                            <div class="m-b" style="line-height: 32px">
+                                <span class="pull-left">
+                                    <div>
+                                        <span class="label label-danger pull-left">平均停车次数</span>
+                                        <br>
+                                        <input id="average_stop_time" width="100%" type="number" readonly />
+                                    </div>
+                                </span>
+                            </div>
+                            <div class="m-b" style="line-height: 32px">
+                                <span class="pull-left">
+                                    <div>
+                                        <span class="label label-danger pull-left">停 车 比 例</span>
+                                        <br>
+                                        <input id="stop_rate" width="100%" type="number" readonly />
+                                    </div>
+                                </span>
+                            </div>
+
                         </div>
+
+
                     </div>
                 </div>
                 <div class="row gray-bg simulation-graph">
@@ -436,6 +474,7 @@
     <script src="js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
 
     <script src="js/plugins/handsonTable/handsontable.full.js"></script>
+    <script src="js/plugins/progressbar/progressbar.js"></script>
 
     <script type="text/javascript">
 
@@ -443,15 +482,25 @@
     var visualizer = window.visualizer;
     var settings = window.settings;
 
+    var isDemo = true;
 
     var signalSettings = {};
 
     var mapJson = {};
 
-    // 解析json的map
-    function UploadAndParseJsonMap(){}
+    var sim_time = 0;
 
 $(function(){
+
+    function downloadFile(fileName, content){
+        var aLink = document.createElement('a');
+        var blob = new Blob([content]);
+        var evt = document.createEvent("HTMLEvents");
+        evt.initEvent("click", false, false);//initEvent 不加后两个参数在FF下会报错, 感谢 Barret Lee 的反馈
+        aLink.download = fileName;
+        aLink.href = URL.createObjectURL(blob);
+        aLink.dispatchEvent(evt);
+    }
 
     $('#clear_build_world').click(function () {
         window.builderWorld.clear();
@@ -459,17 +508,29 @@ $(function(){
 
     $('#export_build_json').click(function () {
         window.builderWorld.save();
-        console.log(localStorage.world);
+        downloadFile("map.json",localStorage.world);
+    });
+
+    $('#edit-map').click(function(){
+        $("#world_builder").click();
     });
 
 });
 
+var elem = document.querySelector('.js-running');
+var isRunning = new Switchery(elem, { color: '#1AB394' });
 $(function() {
 
-    var elem = document.querySelector('.js-running');
-    var isRunning = new Switchery(elem, { color: '#1AB394' });
     elem.addEventListener('change', function () {
         visualizer.running = this.checked;
+    });
+
+    $('#sim_tab').click(function (){
+        if (!isDemo){
+            $('#sim_demo_param').hide();
+            $('#sim_real').show();
+            $('#home').scrollTop(0);
+        }
     });
 
     $('#export_world').click(function () {
@@ -723,6 +784,9 @@ $(function() {
     var selectIntersection = $('#signal-control-intersection');
     var intersectionId;
     var controlSignals;
+
+
+
     function loadSelectedIntersection() {
        intersectionId = selectIntersection.find(':selected').val();
        controlSignals = window.jsonMap.intersections[intersectionId].controlSignals;
@@ -884,9 +948,45 @@ $(function() {
     $('#start-sim').click(function() {
        visualizer.previousTime = 0;
        world.load(JSON.stringify(window.jsonMap));
+
+       isDemo = false;
+       sim_time = parseInt($("#sim-time").val() || 3600);
+
        visualizer.start(false);
+
+        var element = document.getElementById('simProgress-container');
+
+        var seconds = new ProgressBar.Circle(element, {
+            duration: 200,
+            color: "#A3E1D4",
+            trailColor: "#ddd",
+            strokeWidth: 15,
+            trailWidth: 8
+        });
+
+        var progress = 0.00;
+        var sim = setInterval(function() {
+
+            var second = world.sim_time;
+            progress= Math.round(second / sim_time *100)/100.0;
+            seconds.animate(progress<1 ? progress : 1.0 , function() {
+                if (second <= sim_time){
+                    seconds.setText(progress  * 100 + " %");
+                    $("#stop_rate").val(world.instantStopRate);
+                    $("#average_stop_time").val(world.instantStopTimes);
+                }else{
+                    seconds.setText("仿真完毕");
+                    world.clear();
+                    visualizer.isRunning = false;
+                    window.clearInterval(sim);
+                }
+            });
+        }, 1000);
+
     });
 });
+
+
     </script>
 </body>
 </html>

@@ -18,6 +18,12 @@ class ToolHighlighter extends Tool
     if hoveredIntersection?
       hoveredIntersection.color = settings.colors.hoveredIntersection
 
+  mousedown: (e) =>
+    if e.ctrlKey
+      intersection = @getHoveredRealIntersection @getCell e
+      if intersection
+        localStorage.selectedIntersectionId = intersection.id;
+
   mouseout: =>
     @hoveredCell = null
 

@@ -119,11 +119,13 @@ class Car
     if @speed < 0.0001
       testspeed = parseInt @speed
     if @last_speed > 0 and testspeed is 0
-      @last_speed = testspeed
+      @last_speed = 0
       @stop_times += 1
     #    如果上一个时间点的车速为零，这一个时间点的车速也未零，表示
     if @last_speed is 0 and testspeed is 0
       @stop_delay += delta
+    if @last_speed is 0 and testspeed > 0
+      @last_speed = testspeed
 
 
     if not @trajectory.isChangingLanes and @nextLane
