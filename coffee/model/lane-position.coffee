@@ -31,11 +31,13 @@ class LanePosition
     if @lane?.addCarPosition?
       @free = false
       @lane.addCarPosition this
+      @lane.carsNumber += 1
 
   release: ->
     if not @free and @lane?.removeCar
       @free = true
       @lane.removeCar this
+      @lane.carsNumber -= 1
 
   getNextCarDistanceinNextLane: (nextLane) ->
 #    return @lane.getNextLanesNextCar @position, nextLane

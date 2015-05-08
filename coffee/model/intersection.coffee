@@ -23,18 +23,26 @@ class Intersection
     @avragelineCars = 0
     @generateCar = false
     @CPAThroughIntersectionMapByCycle[0] = 0
+#    用于统计所有的通过交叉口的车辆
+    @totalCarNum = 0
+#    用于同济所用通过交叉口的车辆的停车次数
+    @totalCarStopTimes = 0
+#    所有车辆的交叉口的停车延时
+    @totalCarDelay = 0
+
 
 #  用于计算当前当前周期交叉口排队长度 最大排队长度是每条车道上的车辆数
   caculatorCarInLane: (CycleNum) ->
     if @CycleNum+1 is CycleNum
       @carStayInLaneMapByCycle[@CycleNum] = @avragelineCars / (@roads[0].lanesNumber * 4)
+      @carStayInLaneMapByCycle[CycleNum] = 0
       @avragelineCars = 0
       @CPAThroughIntersectionMapByCycle[CycleNum] = 0
       @CycleNum = CycleNum
     for road in @inRoads
-      if @controlSignals.state[road.targetSideId][0] is 1
+      if @controlSignals.state[road.targetSideId][1] is 1
         for lane in road.lanes
-          @avragelineCars += lane.carsPositions.size
+          @avragelineCars += lane.carsNumber
 
   @copy: (intersection) ->
     intersection.rect = Rect.copy intersection.rect
@@ -44,10 +52,15 @@ class Intersection
     result.inRoads = []
     result.carStayInLaneMapByCycle = {}
     result.CPAThroughIntersectionMapByCycle = {}
+    result.CPAThroughIntersectionMapByCycle[0] = 0
     result.carStayInLaneMapByCycle = {}
     result.maxCPA = 0
     result.CycleNum = 0
     result.generateCar = false
+    result.totalCarNum = 0
+    result.totalCarStopTimes = 0
+    result.totalCarDelay = 0
+    result.avragelineCars = 0
     result.controlSignals = ControlSignals.copy result.controlSignals, result
     result
 

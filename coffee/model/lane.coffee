@@ -21,6 +21,8 @@ class Lane
     @carsPositions = {}
     #    车辆集合
     @carsInLane = {}
+    #    车道上的车辆数
+    @carsNumber = 0
     #   更新函数
     @update()
 

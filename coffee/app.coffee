@@ -9,14 +9,22 @@ World = require './model/world'
 settings = require './settings'
 
 $ ->
-  canvas = $('<canvas />', {id: 'canvas'})
-  $('#simulation-canvas').append(canvas)
-  builderCanvas = $('<canvas />', {id: 'builder-canvas'})
-  $('#map-builder-canvas').append(builderCanvas)
 
-  signalHelpCanvas = $('<canvas />', {id: 'signalHelpCanvas'})
-  $('#signal-help-canvas').append(builderCanvas)
-  $('#signal-help-canvas').hide()
+  canvas = $('<canvas />', {id: 'canvas'})
+#  canvas.attr
+#    width: $(window).width()
+#    height: $(window).height()
+  $('#simulation-canvas').append(canvas)
+
+  builderCanvas = $('<canvas />', {id: 'builder-canvas'})
+#  builderCanvas.attr
+#    width: $(window).width()
+#    height: $(window).height()
+  $('#map-builder-canvas').append(builderCanvas)
+#
+#  signalHelpCanvas = $('<canvas />', {id: 'signalHelpCanvas'})
+#  $('#signal-help-canvas').append(builderCanvas)
+##  $('#signal-help').hide()
 
   window.world = new World()
   window.visualizer = new Visualizer world, canvas
@@ -26,9 +34,9 @@ $ ->
   window.builderVisualizer = new Visualizer builderWorld, builderCanvas
   window.builderVisualizer.start(true)
 
-  window.signalHelpWorld = new World()
-  window.signalHelpVisualizer = new Visualizer signalHelpWorld, signalHelpCanvas
-  window.signalHelpVisualizer.start(true)
+#  window.signalHelpWorld = new World()
+#  window.signalHelpVisualizer = new Visualizer signalHelpWorld, signalHelpCanvas
+#  window.signalHelpVisualizer.start(true)
 
 
   window.settings = settings

@@ -97,6 +97,7 @@ class Trajectory
     @temp.position += distance
     if @timeToMakeTurn() and @canEnterIntersection() and @isValidTurn()
       @current.lane.road.target.CPAThroughIntersectionMapByCycle[@current.lane.road.target.CycleNum] +=1
+      @current.lane.road.target.totalCarNum += 1
       nextLane = @car.popNextLane()
 #      @_startChangingLanes nextLane, 0
       if @turnNumber isnt 1

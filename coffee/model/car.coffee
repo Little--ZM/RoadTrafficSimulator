@@ -121,9 +121,11 @@ class Car
     if @last_speed > 0 and testspeed is 0
       @last_speed = 0
       @stop_times += 1
+      @trajectory.current.lane.road.target.totalCarStopTimes += 1
     #    如果上一个时间点的车速为零，这一个时间点的车速也未零，表示
     if @last_speed is 0 and testspeed is 0
       @stop_delay += delta
+      @trajectory.current.lane.road.target.totalCarDelay += 1
     if @last_speed is 0 and testspeed > 0
       @last_speed = testspeed
 

@@ -90,6 +90,7 @@ class ControlSignals
     result.timeSettings = controlSignals.timeSettings
     result.stateNum = 0
     result.time = 0
+    result.cycleNumber=0
     result.intersection = intersection
     result
 

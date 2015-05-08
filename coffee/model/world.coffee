@@ -46,6 +46,19 @@ class World
       return 0 if @totalStopCarsNum is 0
       return @totalStopCarsNum/@totalCarsNum
 
+  #  实时停车比例
+  @property "realIntersectionData",
+    get: ->
+      for id, intersection of @realIntersection.all()
+        dataProvider = []
+        for k,v of intersection.CPAThroughIntersectionMapByCycle
+          dataProvider.push {"index":k, "carInLane":intersection.carStayInLaneMapByCycle[k], "cap":v}
+        @dataProviders[id] = dataProvider
+      data = JSON.stringify @dataProviders
+      return data
+
+
+
 
   #    环境设定
   set: (obj) ->
@@ -81,6 +94,7 @@ class World
     @totalCarsNum = 0
 #   仿真的时间
     @sim_time = 0
+    @dataProviders = {}
 
   save: ->
     @generateRealIntersecionAndCarProducer()
@@ -106,6 +120,7 @@ class World
       @addRoad road
     @generateRealIntersecionAndCarProducer()
 #    区分真实交叉口以及 车辆产生rect
+
 
   generateRealIntersecionAndCarProducer: ->
     @realIntersection.clear()

@@ -170,11 +170,12 @@
                     </div>
                 </div>
 
-                <div class="row" >
-                    <div id = "signal-help-canvas">
+                <!--<div class="row" id="signal-help" >-->
 
-                    </div>
-                </div>
+                    <!--<div class="col-lg-9" id="signal-help-canvas">-->
+                    <!--</div>-->
+
+                <!--</div>-->
 
                 <div class="row">
 
@@ -291,7 +292,19 @@
                         <div class="m-b">
                             <button id="clear_build_world" class="btn btn-sm btn-primary">清空</button>
                             <button id="export_build_json" class="btn btn-sm btn-primary">导出JSON</button>
+
                         </div>
+                        <div id="select_intersection_div"  class="m-b" style="display: none">
+
+                            <p>按住 <code>ctrl</code>键<p>
+                            <p>点击交叉口，查看<code> 交叉口ID</code></p>
+                            <div>
+                                <span class="label label-success">交叉口ID</span>
+                            </div>
+                            <br>
+                            <input id="select_intersection" type="text" readonly>
+                            <br/>
+                       </div>
                     </div>
                 </div>
             </div>
@@ -415,6 +428,145 @@
                         <h2>Simulation Result</h2>
                     </div>
                 </div>
+                <br/>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-success pull-left">平均延误</span>
+                            </div>
+                            <div class="ibox-content">
+                                <h1 id="average_delay" class="no-margins">40886200</h1>
+                                <div class="stat-percent font-bold text-success">sec <i class="fa fa-clock-o"></i></div>
+                                <small>单位</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-info pull-left">总延误</span>
+                            </div>
+                            <div class="ibox-content">
+                                <h1 id="total_delay" class="no-margins">275,800</h1>
+                                <div class="stat-percent font-bold text-info">h <i class="fa fa-clock-o"></i></div>
+                                <small>单位</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-primary pull-left">平均速度</span>
+                            </div>
+                            <div class="ibox-content">
+                                <h1 id="average_speed" class="no-margins">106,120</h1>
+                                <div class="stat-percent font-bold text-navy">km/h <i class="fa fa-level-up"></i></div>
+                                <small>单位</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-danger pull-left">总通过量</span>
+                            </div>
+                            <div class="ibox-content">
+                                <h1 id="total_car_number" class="no-margins">80,600</h1>
+                                <div class="stat-percent font-bold text-danger">vel <i class="fa fa-car"></i></div>
+                                <small>单位</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-success pull-left">平均停车延误</span>
+                            </div>
+                            <div class="ibox-content">
+                                <h1 id="average_stop_delay" class="no-margins">40886200</h1>
+                                <div class="stat-percent font-bold text-success">sec <i class="fa fa-clock-o"></i></div>
+                                <small>单位</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-info pull-left">总停车延误</span>
+                            </div>
+                            <div class="ibox-content">
+                                <h1 id="total_stop_delay" class="no-margins">275,800</h1>
+                                <div class="stat-percent font-bold text-info">h <i class="fa fa-clock-o"></i></div>
+                                <small>单位</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-primary pull-left">平均停车次数</span>
+                            </div>
+                            <div class="ibox-content">
+                                <h2 id="average_stop_times" class="no-margins">106,120</h2>
+                                <div class="stat-percent font-bold text-navy">time <i class="fa fa-minus-circle"></i></div>
+                                <small>单位</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-warning pull-left">停车比例</span>
+                            </div>
+                            <div class="ibox-content">
+                                <h2 id="total_stop_times" class="no-margins">80,600</h2>
+                                <div class="stat-percent font-bold text-danger">time <i class="fa fa-minus-circle"></i></div>
+                                <small>单位</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <span class="label label-danger pull-left">总停车次数</span>
+                            </div>
+                            <div class="ibox-content">
+                                <h2 id="total_stop_rate" class="no-margins">80,600</h2>
+                                <div class="stat-percent font-bold text-danger"> % <i class="fa fa-tachometer"></i></div>
+                                <small>单位</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <span class="label label-success pull-left">交叉口分周期信息展示图</span>
+                        </div>
+                        <div class="ibox-content">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <span class="label text-success pull-left">选择要查看的交叉口 <i class="fa fa-clock-o"></i></span>
+                                </div>
+                                <div class="col-sm-2">
+                                    <select id="real-intersections" class="form-control"></select>
+                                </div>
+                            </div>
+
+                            <br>
+                            <div id="chartdiv"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
             </div>
 
             <!-- Help Page -->
@@ -447,6 +599,7 @@
     </div>
 
     <link rel="stylesheet" href="css/custom.css" />
+    <link rel="stylesheet" href="js/plugins/amCharts/plugins/export/export.css" />
     <link rel="stylesheet" href="css/animate.css" />
     <link rel="stylesheet" media="screen" href="css/plugins/handsonTable/handsontable.full.css">
 
@@ -475,6 +628,12 @@
 
     <script src="js/plugins/handsonTable/handsontable.full.js"></script>
     <script src="js/plugins/progressbar/progressbar.js"></script>
+
+    <script src="js/plugins/amCharts/amcharts.js"></script>
+    <script src="js/plugins/amCharts/serial.js"></script>
+    <script src="js/plugins/amCharts/themes/dark.js"></script>
+    <script src="js/plugins/amCharts/plugins/export/export.js"></script>
+
 
     <script type="text/javascript">
 
@@ -509,6 +668,11 @@ $(function(){
     $('#export_build_json').click(function () {
         window.builderWorld.save();
         downloadFile("map.json",localStorage.world);
+
+        $('#select_intersection_div').show();
+        setInterval(function showIntersecionId(){
+            $("#select_intersection").val(localStorage.selectedIntersectionId);
+        }, 50);
     });
 
     $('#edit-map').click(function(){
@@ -771,6 +935,78 @@ $(function() {
 
 });
 
+    var chart = AmCharts.makeChart("chartdiv", {
+        "type": "serial",
+        "theme": "dark",
+        "legend": {
+            "equalWidths": false,
+            "useGraphSettings": true,
+            "valueAlign": "left",
+            "valueWidth": 120
+        },
+        "dataProvider":[],
+        "valueAxes": [{
+            "id": "distanceAxis",
+            "axisAlpha": 0,
+            "gridAlpha": 0,
+            "position": "left",
+            "title": "通过车辆数"
+        }, {
+            "id": "latitudeAxis",
+            "axisAlpha": 0,
+            "gridAlpha": 0,
+            "title": "平均排队长度",
+            "position": "right"
+        }],
+        "graphs": [{
+            "alphaField": "alpha",
+            "balloonText": "[[value]] vel",
+            "dashLengthField": "dashLength",
+            "fillAlphas": 0.7,
+            "legendPeriodValueText": "total: [[value.sum]] vel",
+            "legendValueText": "[[value]] vel",
+            "title": "通过车辆数",
+            "type": "column",
+            "valueField": "cap",
+            "valueAxis": "distanceAxis"
+        }, {
+            "bullet": "square",
+            "bulletBorderAlpha": 1,
+            "bulletBorderThickness": 1,
+            "dashLengthField": "dashLength",
+            "legendValueText": "[[value]] vel",
+            "title": "排队长度",
+            "fillAlphas": 0,
+            "valueField": "carInLane",
+            "valueAxis": "latitudeAxis"
+        }],
+        "chartCursor": {
+            "categoryBalloonDateFormat": "DD",
+            "cursorAlpha": 0.1,
+            "cursorColor":"#000000",
+            "fullWidth":true,
+            "valueBalloonsEnabled": false,
+            "zoomable": false
+        },
+        "categoryField": "index",
+        "categoryAxis": {
+            "autoGridCount": false,
+            "axisColor": "#555555",
+            "gridAlpha": 0.1,
+            "gridColor": "#FFFFFF",
+            "gridCount": 50
+        },
+        "export": {
+            "enabled": true,
+//            "backgroundAlpha": 1,
+            "backgroundColor": "#3F3F4F",
+            "theme": AmCharts.themes.dark,
+            "libs": {
+                "path": "http://www.amcharts.com/lib/3/plugins/export/libs/"
+            }
+        }
+    });
+
 $(function() {
 
     var single_time;
@@ -785,6 +1021,12 @@ $(function() {
     var intersectionId;
     var controlSignals;
 
+    window.jsonResult = {};
+
+
+
+
+    var realInterSection = $('#real-intersections');
 
 
     function loadSelectedIntersection() {
@@ -943,8 +1185,27 @@ $(function() {
         window.jsonMap = JSON.parse($('#load-json-map-modal textarea').val());
         loadIntersections();
         $('#load-json-map-modal').modal('hide');
+//        window.signalHelpVisualizer.previousTime = 0;
+//        window.signalHelpWorld.load(JSON.stringify(window.jsonMap));
+//        $('#signal-help').show();
     });
 
+    function loadRealInterSectionResult(){
+        intersectionId = realInterSection.find(':selected').val();
+        chart.dataProvider = window.jsonResult[intersectionId];
+        chart.validateData();
+    }
+
+    function loadRealInterSectionAfter(){
+        realInterSection.html('');
+        _.each(window.jsonMap.realIntersection, function(intersection) {
+            realInterSection.append($('<option>', {value: intersection.id, text: intersection.id}));
+        });
+        realInterSection.first('option').prop("selected", true);
+        loadRealInterSectionResult();
+    }
+
+    realInterSection.change(loadRealInterSectionResult);
     $('#start-sim').click(function() {
        visualizer.previousTime = 0;
        world.load(JSON.stringify(window.jsonMap));
@@ -976,9 +1237,11 @@ $(function() {
                     $("#average_stop_time").val(world.instantStopTimes);
                 }else{
                     seconds.setText("仿真完毕");
+                    window.jsonResult = JSON.parse(world.realIntersectionData);
                     world.clear();
                     visualizer.isRunning = false;
                     window.clearInterval(sim);
+                    loadRealInterSectionAfter();
                 }
             });
         }, 1000);
