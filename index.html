@@ -436,7 +436,7 @@
                                 <span class="label label-success pull-left">平均延误</span>
                             </div>
                             <div class="ibox-content">
-                                <h1 id="average_delay" class="no-margins">40886200</h1>
+                                <h1 id="average_delay" class="no-margins">null</h1>
                                 <div class="stat-percent font-bold text-success">sec <i class="fa fa-clock-o"></i></div>
                                 <small>单位</small>
                             </div>
@@ -448,7 +448,7 @@
                                 <span class="label label-info pull-left">总延误</span>
                             </div>
                             <div class="ibox-content">
-                                <h1 id="total_delay" class="no-margins">275,800</h1>
+                                <h1 id="total_delay" class="no-margins">null</h1>
                                 <div class="stat-percent font-bold text-info">h <i class="fa fa-clock-o"></i></div>
                                 <small>单位</small>
                             </div>
@@ -460,7 +460,7 @@
                                 <span class="label label-primary pull-left">平均速度</span>
                             </div>
                             <div class="ibox-content">
-                                <h1 id="average_speed" class="no-margins">106,120</h1>
+                                <h1 id="average_speed" class="no-margins">null</h1>
                                 <div class="stat-percent font-bold text-navy">km/h <i class="fa fa-level-up"></i></div>
                                 <small>单位</small>
                             </div>
@@ -472,7 +472,7 @@
                                 <span class="label label-danger pull-left">总通过量</span>
                             </div>
                             <div class="ibox-content">
-                                <h1 id="total_car_number" class="no-margins">80,600</h1>
+                                <h1 id="total_car_number" class="no-margins">null</h1>
                                 <div class="stat-percent font-bold text-danger">vel <i class="fa fa-car"></i></div>
                                 <small>单位</small>
                             </div>
@@ -486,7 +486,7 @@
                                 <span class="label label-success pull-left">平均停车延误</span>
                             </div>
                             <div class="ibox-content">
-                                <h1 id="average_stop_delay" class="no-margins">40886200</h1>
+                                <h1 id="average_stop_delay" class="no-margins">null</h1>
                                 <div class="stat-percent font-bold text-success">sec <i class="fa fa-clock-o"></i></div>
                                 <small>单位</small>
                             </div>
@@ -498,7 +498,7 @@
                                 <span class="label label-info pull-left">总停车延误</span>
                             </div>
                             <div class="ibox-content">
-                                <h1 id="total_stop_delay" class="no-margins">275,800</h1>
+                                <h1 id="total_stop_delay" class="no-margins">null</h1>
                                 <div class="stat-percent font-bold text-info">h <i class="fa fa-clock-o"></i></div>
                                 <small>单位</small>
                             </div>
@@ -510,7 +510,7 @@
                                 <span class="label label-primary pull-left">平均停车次数</span>
                             </div>
                             <div class="ibox-content">
-                                <h2 id="average_stop_times" class="no-margins">106,120</h2>
+                                <h2 id="average_stop_times" class="no-margins">null</h2>
                                 <div class="stat-percent font-bold text-navy">time <i class="fa fa-minus-circle"></i></div>
                                 <small>单位</small>
                             </div>
@@ -519,10 +519,10 @@
                     <div class="col-lg-2">
                         <div class="ibox float-e-margins">
                             <div class="ibox-title">
-                                <span class="label label-warning pull-left">停车比例</span>
+                                <span class="label label-warning pull-left">总停车次数</span>
                             </div>
                             <div class="ibox-content">
-                                <h2 id="total_stop_times" class="no-margins">80,600</h2>
+                                <h2 id="total_stop_times" class="no-margins">null</h2>
                                 <div class="stat-percent font-bold text-danger">time <i class="fa fa-minus-circle"></i></div>
                                 <small>单位</small>
                             </div>
@@ -531,10 +531,10 @@
                     <div class="col-lg-2">
                         <div class="ibox float-e-margins">
                             <div class="ibox-title">
-                                <span class="label label-danger pull-left">总停车次数</span>
+                                <span class="label label-danger pull-left">停车比例</span>
                             </div>
                             <div class="ibox-content">
-                                <h2 id="total_stop_rate" class="no-margins">80,600</h2>
+                                <h2 id="total_stop_rate" class="no-margins">null</h2>
                                 <div class="stat-percent font-bold text-danger"> % <i class="fa fa-tachometer"></i></div>
                                 <small>单位</small>
                             </div>
@@ -562,7 +562,6 @@
                             <div id="chartdiv"></div>
                         </div>
                     </div>
-
                 </div>
 
 
@@ -693,9 +692,27 @@ $(function() {
         if (!isDemo){
             $('#sim_demo_param').hide();
             $('#sim_real').show();
-            $('#home').scrollTop(0);
         }
+        $('#wrapper').scrollTop(0);
     });
+
+    $('#world_builder').click(function (){
+        $('#wrapper').scrollTop(0);
+    });
+
+    $('#home').click(function (){
+        $('#wrapper').scrollTop(0);
+    });
+
+    $('#result').click(function (){
+        $('#wrapper').scrollTop(0);
+    });
+
+
+
+//    $('#home').click(function (){
+//
+//    });
 
     $('#export_world').click(function () {
         world.save();
@@ -1206,11 +1223,24 @@ $(function() {
     }
 
     realInterSection.change(loadRealInterSectionResult);
+
+    function loadResult(){
+        $("#average_delay").html(Math.round(world.instantDelay * 1000) / 1000.0);
+        $("#total_delay").html(Math.round(world.totalDelay / 3600 * 1000) / 1000.0);
+        $("#average_speed").html(Math.round(world.instantSpeed  * 1000) / 1000.0);
+        $("#total_car_number").html(Math.round(world.totalCarsNum  * 1000) / 1000.0);
+        $("#average_stop_delay").html(Math.round(world.instantStopDelay * 1000) / 1000.0);
+        $("#total_stop_delay").html(Math.round(world.totalStopDelay / 3600 * 1000) / 1000.0);
+        $("#average_stop_times").html(Math.round(world.instantStopTimes  * 1000) / 1000.0);
+        $("#total_stop_times").html(Math.round(world.totalStopCarsNum * 1000) / 1000.0);
+        $("#total_stop_rate").html(Math.round(world.instantStopRate * 1000) / 10.0);
+    }
     $('#start-sim').click(function() {
+        isDemo = false;
+       $('#sim_tab').click();
        visualizer.previousTime = 0;
        world.load(JSON.stringify(window.jsonMap));
 
-       isDemo = false;
        sim_time = parseInt($("#sim-time").val() || 3600);
 
        visualizer.start(false);
@@ -1229,15 +1259,17 @@ $(function() {
         var sim = setInterval(function() {
 
             var second = world.sim_time;
-            progress= Math.round(second / sim_time *100)/100.0;
-            seconds.animate(progress<1 ? progress : 1.0 , function() {
+            progress= Math.round(second / sim_time * 1000);
+            progress = progress / 1000;
+            seconds.animate(progress <1 ? progress : 1.0 , function() {
                 if (second <= sim_time){
-                    seconds.setText(progress  * 100 + " %");
+                    seconds.setText(progress * 100 + " %");
                     $("#stop_rate").val(world.instantStopRate);
                     $("#average_stop_time").val(world.instantStopTimes);
                 }else{
                     seconds.setText("仿真完毕");
                     window.jsonResult = JSON.parse(world.realIntersectionData);
+                    loadResult();
                     world.clear();
                     visualizer.isRunning = false;
                     window.clearInterval(sim);
