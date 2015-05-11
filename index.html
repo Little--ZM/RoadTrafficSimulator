@@ -52,7 +52,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#result" data-toggle="tab">
+                        <a href="#result" id="result_tab" data-toggle="tab">
                             <i class="fa fa-bar-chart-o"></i> <span class="nav-label">Result</span>
                             <span class="label label-primary pull-right">NEW</span>
                         </a>
@@ -106,7 +106,7 @@
                                 <div class="ibox-content">
                                     <h1 class="no-margins">智能跟车模型</h1><br>
                                     <div class="stat-percent font-bold text-success">wiki<i class="fa fa-bolt"></i></div>
-                                    <small>Total income</small>
+                                    <small>From</small>
                                 </div>
                             </div>
                         </div>
@@ -294,16 +294,37 @@
                             <button id="export_build_json" class="btn btn-sm btn-primary">导出JSON</button>
 
                         </div>
+                        <div class="panel panel-success">
+                            <div class="panel-heading">
+                                map builder 使用说明
+                            </div>
+                            <div class="panel-body">
+                                <p>1. 按住<code>shift</code>点击,创建交叉口 </p>
+                                <p>2. 按住<code>shift</code>鼠标拖动连接交叉口，形成道路 </p>
+                                <p>3. 拖拽交叉口，修改，完善地图形状 </p>
+                            </div>
+                        </div>
+
+
                         <div id="select_intersection_div"  class="m-b" style="display: none">
 
-                            <p>按住 <code>ctrl</code>键<p>
-                            <p>点击交叉口，查看<code> 交叉口ID</code></p>
-                            <div>
-                                <span class="label label-success">交叉口ID</span>
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">
+                                    显示交叉口ID
+                                </div>
+                                <div class="panel-body">
+                                    <p>1. 按住 <code>ctrl</code>键<p>
+                                    <p>2. 点击交叉口，查看<code> 交叉口ID</code></p>
+                                    <div>
+                                        <span class="label label-primary">交叉口ID</span>
+                                    </div>
+                                    <div>
+                                        <input id="select_intersection" type="text" readonly>
+                                    </div>
+                                </div>
                             </div>
-                            <br>
-                            <input id="select_intersection" type="text" readonly>
-                            <br/>
+
+
                        </div>
                     </div>
                 </div>
@@ -542,27 +563,6 @@
                     </div>
                 </div>
 
-                <div>
-
-                    <div class="ibox float-e-margins">
-                        <div class="ibox-title">
-                            <span class="label label-success pull-left">交叉口分周期信息展示图</span>
-                        </div>
-                        <div class="ibox-content">
-                            <div class="row">
-                                <div class="col-sm-2">
-                                    <span class="label text-success pull-left">选择要查看的交叉口 <i class="fa fa-clock-o"></i></span>
-                                </div>
-                                <div class="col-sm-2">
-                                    <select id="real-intersections" class="form-control"></select>
-                                </div>
-                            </div>
-
-                            <br>
-                            <div id="chartdiv"></div>
-                        </div>
-                    </div>
-                </div>
 
 
 
@@ -601,6 +601,7 @@
     <link rel="stylesheet" href="js/plugins/amCharts/plugins/export/export.css" />
     <link rel="stylesheet" href="css/animate.css" />
     <link rel="stylesheet" media="screen" href="css/plugins/handsonTable/handsontable.full.css">
+    <link rel="stylesheet" media="screen" href="css/plugins/amCharts/amCharts.css">
 
 <!--    <script src="js/inspinia.js"></script>-->
 
@@ -649,7 +650,7 @@
     var sim_time = 0;
 
 $(function(){
-
+    // 下载文件的函数
     function downloadFile(fileName, content){
         var aLink = document.createElement('a');
         var blob = new Blob([content]);
@@ -704,7 +705,7 @@ $(function() {
         $('#wrapper').scrollTop(0);
     });
 
-    $('#result').click(function (){
+    $('#result_tab').click(function (){
         $('#wrapper').scrollTop(0);
     });
 
@@ -985,7 +986,8 @@ $(function() {
             "title": "通过车辆数",
             "type": "column",
             "valueField": "cap",
-            "valueAxis": "distanceAxis"
+            "valueAxis": "distanceAxis",
+            animationPlayed: true
         }, {
             "bullet": "square",
             "bulletBorderAlpha": 1,
@@ -995,7 +997,8 @@ $(function() {
             "title": "排队长度",
             "fillAlphas": 0,
             "valueField": "carInLane",
-            "valueAxis": "latitudeAxis"
+            "valueAxis": "latitudeAxis",
+            animationPlayed: true
         }],
         "chartCursor": {
             "categoryBalloonDateFormat": "DD",
